@@ -15,6 +15,7 @@ version = "0.1.0"
 dependencies = [
  "aether-compat",
  "aether-manifest",
+ "aether-security",
  "casfs",
 ]
 
@@ -23,6 +24,14 @@ name = "aether-manifest"
 version = "0.1.0"
 dependencies = [
  "aether-compat",
+ "aether-security",
+ "casfs",
+]
+
+[[package]]
+name = "aether-security"
+version = "0.1.0"
+dependencies = [
  "casfs",
 ]
 

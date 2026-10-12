@@ -7,3 +7,4 @@ edition = "2021"
 casfs = { path = "../casfs" }
 aether-manifest = { path = "../manifest" }
 aether-compat = { path = "../compat" }
+aether-security = { path = "../security" }

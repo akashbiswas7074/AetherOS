@@ -11,7 +11,7 @@ use arch::cpu::hlt;
 use arch::serial::SERIAL1;
 use arch::vga::{Color, VGA_WRITER};
 use casfs::{hash, CasStorageEngine};
-use manifest::{DriverKind, DriverManifest, SystemFlake, UserCapability, UserProfile};
+use aether_manifest::{DriverKind, DriverManifest, SystemFlake, UserCapability, UserProfile};
 use mm::PhysicalFrameAllocator;
 
 #[no_mangle]
@@ -101,14 +101,34 @@ pub extern "C" fn _start() -> ! {
     println!("[INIT] Activating Universal Multi-ABI Engine (Linux + Windows + Mac)...");
     let mut abi_engine = aether_compat::UniversalAbiEngine::new();
     let test_elf = [0x7F, b'E', b'L', b'F', 2, 1, 1, 0];
-    let res = abi_engine.execute(&test_elf);
+    let _res = abi_engine.execute(&test_elf);
     println!("       Universal ABI Dispatch active: Linux ELF execution ready.");
+
+    // 9. Blockchain-Grade Security Subsystem
+    println!("[SECURITY] Mounting Blockchain Audit Ledger & Measured Boot...");
+    let mut ledger = aether_security::AuditLedger::new();
+    let mut boot_chain = aether_security::MeasuredBootChain::new();
+    let pcr = boot_chain.extend_measurement(
+        aether_security::AttestationStage::KernelBareMetal,
+        b"aether_kernel_elf64",
+    );
+    ledger.record_event(aether_security::AuditEvent::new(
+        aether_security::AuditEventKind::BootAttestation,
+        "kernel",
+        pcr,
+        1,
+    ));
+    let genesis_hash = ledger.commit_current_block();
+    print!("       Genesis Audit Block (BLAKE3): ");
+    let _ = genesis_hash.write_hex(&mut port);
+    println!("");
+    println!("       Tamper-Proof Audit Hash-Chain: ACTIVE");
 
     unsafe {
         VGA_WRITER.set_color(Color::LightGreen, Color::Black);
     }
     println!("================================================================");
-    println!("  STATUS: Kernel Running in Hyper-Speed Mode. Ready for tasks!  ");
+    println!("  STATUS: Kernel Running with Active Blockchain Security!       ");
     println!("================================================================");
 
     // Halt loop

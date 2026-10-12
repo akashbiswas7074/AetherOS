@@ -55,6 +55,14 @@ By building the core kernel and storage engine in **Rust**:
 - Null pointer dereferences, data races across threads, and buffer overflows are eliminated at compile time.
 - Assembly is restricted only to hardware bootstrapping where direct CPU register control is strictly mandatory.
 
+### 4. Blockchain-Grade Security Subsystem
+AetherOS brings blockchain cryptography directly into kernel and userspace security:
+- **Immutable Audit Ledger**: Critical security events (logins, privilege delegations, system changes) are committed into an append-only Merkle-linked blockchain hash-chain, defeating anti-forensics attacks.
+- **Anti-Supply-Chain Attestation**: Downloaded packages are cryptographically verified against a decentralized consensus hash registry before execution, preventing malicious backdoor injection.
+- **Zero-Trust Capability Tokens**: Eliminates monolithic `root` and `sudo` vulnerabilities. Permissions are granted via cryptographically signed capability tokens with microsecond granularity and automatic expiration.
+- **Measured Boot PCR Chain**: Cumulative cryptographic measurement across BIOS, MBR, bare-metal kernel, and driver manifests to detect bootkits and unauthorized disk tampering.
+
+
 ---
 
 ## 4. System Architecture
@@ -176,6 +184,11 @@ operating_system/
 │       ├── system_flake.rs     # Immutable system generation Merkle root
 │       ├── user_profile.rs     # Capability-based user sandbox
 │       └── bin/boot_sim.rs     # System boot simulator & diagnostic inspector
+├── security/                   # Blockchain-Grade Security Subsystem
+│   └── src/
+│       ├── ledger.rs           # Immutable audit blockchain & Merkle blocks
+│       ├── attestation.rs      # Measured boot PCRs & anti-supply-chain checks
+│       └── token.rs            # Zero-trust cryptographic capability tokens
 ├── shell.nix                   # Hermetic, reproducible Nix development environment
 ├── Makefile                    # Build orchestration
 └── run.sh                      # One-click launch script

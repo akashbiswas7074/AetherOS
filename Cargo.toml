@@ -5,6 +5,7 @@ members = [
     "casfs",
     "manifest",
     "compat",
+    "security",
 ]
 
 [profile.dev]

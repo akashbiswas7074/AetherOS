@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 casfs = { path = "../casfs" }
 aether-compat = { path = "../compat" }
+aether-security = { path = "../security" }

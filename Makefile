@@ -7,13 +7,13 @@ QEMU ?= $(shell which qemu-system-x86_64 2>/dev/null || echo /nix/store/gx222l0z
 all: build-image check test
 
 build:
-	cargo build --package aether-kernel --target x86_64-unknown-none
+	cargo build --package aether-kernel
 
 check:
-	cargo check --package casfs --package aether-manifest --package aether-compat
+	cargo check --package casfs --package aether-manifest --package aether-compat --package aether-security
 
 test:
-	cargo test --package casfs --package aether-manifest --package aether-compat
+	cargo test --package casfs --package aether-manifest --package aether-compat --package aether-security
 
 sim:
 	cargo run --package aether-manifest --bin boot_sim

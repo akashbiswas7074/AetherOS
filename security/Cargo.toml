@@ -1,0 +1,7 @@
+[package]
+name = "aether-security"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+casfs = { path = "../casfs" }

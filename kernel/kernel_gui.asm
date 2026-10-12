@@ -1175,7 +1175,7 @@ execute_command:
     ret
 
 ; Direct VGA string writer (does not advance hardware terminal cursor or cause scroll)
-vga_write_str_at:
+.vga_write_str_at:
     ; EDI = VGA offset, ESI = string, AH = attribute
     push eax
     push esi
@@ -1194,7 +1194,7 @@ vga_write_str_at:
     pop eax
     ret
 
-nano_draw_top_bar:
+.nano_draw_top_bar:
     push eax
     push ecx
     push edi
@@ -1210,19 +1210,19 @@ nano_draw_top_bar:
     mov edi, VGA_TEXT + (2 * 2)
     mov esi, str_nano_title
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
 
     ; Write "File: " at column 28
     mov edi, VGA_TEXT + (28 * 2)
     mov esi, str_nano_file_lbl
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
 
     ; Write current filename at column 34
     mov edi, VGA_TEXT + (34 * 2)
     mov esi, nano_cur_filename
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
 
     ; If modified, write "[ Modified ]" at column 66
     cmp byte [nano_is_modified], 1
@@ -1230,7 +1230,7 @@ nano_draw_top_bar:
     mov edi, VGA_TEXT + (66 * 2)
     mov esi, str_nano_modified_tag
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
 
 .ntb_done:
     pop esi
@@ -1239,7 +1239,7 @@ nano_draw_top_bar:
     pop eax
     ret
 
-nano_draw_bottom_bars:
+.nano_draw_bottom_bars:
     push eax
     push ecx
     push edi
@@ -1255,56 +1255,56 @@ nano_draw_bottom_bars:
     mov edi, VGA_TEXT + ((23 * 80 + 0) * 2)
     mov esi, str_k_g
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((23 * 80 + 2) * 2)
     mov esi, str_lbl_help
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((23 * 80 + 13) * 2)
     mov esi, str_k_o
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((23 * 80 + 15) * 2)
     mov esi, str_lbl_writeout
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((23 * 80 + 26) * 2)
     mov esi, str_k_w
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((23 * 80 + 28) * 2)
     mov esi, str_lbl_whereis
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((23 * 80 + 39) * 2)
     mov esi, str_k_k
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((23 * 80 + 41) * 2)
     mov esi, str_lbl_cut
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((23 * 80 + 52) * 2)
     mov esi, str_k_t
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((23 * 80 + 54) * 2)
     mov esi, str_lbl_execute
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((23 * 80 + 65) * 2)
     mov esi, str_k_c
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((23 * 80 + 67) * 2)
     mov esi, str_lbl_location
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     ; Fill Row 24 with default spaces
     mov edi, VGA_TEXT + (24 * 80 * 2)
@@ -1316,56 +1316,56 @@ nano_draw_bottom_bars:
     mov edi, VGA_TEXT + ((24 * 80 + 0) * 2)
     mov esi, str_k_x
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((24 * 80 + 2) * 2)
     mov esi, str_lbl_exit
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((24 * 80 + 13) * 2)
     mov esi, str_k_r
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((24 * 80 + 15) * 2)
     mov esi, str_lbl_readfile
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((24 * 80 + 26) * 2)
     mov esi, str_k_bslash
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((24 * 80 + 28) * 2)
     mov esi, str_lbl_replace
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((24 * 80 + 39) * 2)
     mov esi, str_k_u
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((24 * 80 + 41) * 2)
     mov esi, str_lbl_paste
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((24 * 80 + 52) * 2)
     mov esi, str_k_j
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((24 * 80 + 54) * 2)
     mov esi, str_lbl_justify
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     mov edi, VGA_TEXT + ((24 * 80 + 65) * 2)
     mov esi, str_k_under
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + ((24 * 80 + 67) * 2)
     mov esi, str_lbl_gotoline
     mov ah, ATTR_DEFAULT
-    call vga_write_str_at
+    call .vga_write_str_at
 
     pop esi
     pop edi
@@ -1373,7 +1373,7 @@ nano_draw_bottom_bars:
     pop eax
     ret
 
-nano_set_status:
+.nano_set_status:
     ; ESI = status message string, AH = attribute
     push eax
     push ecx
@@ -1389,7 +1389,7 @@ nano_set_status:
 
     ; Write status text at Col 2
     mov edi, VGA_TEXT + ((22 * 80 + 2) * 2)
-    call vga_write_str_at
+    call .vga_write_str_at
 
     pop esi
     pop edi
@@ -1405,23 +1405,23 @@ nano_set_status:
     rep stosw
 
     ; Draw official Title Bar (Row 0)
-    call nano_draw_top_bar
+    call .nano_draw_top_bar
 
     ; Draw official Shortcut Bars (Rows 23 and 24)
-    call nano_draw_bottom_bars
+    call .nano_draw_bottom_bars
 
     ; Draw status line (Row 22)
     cmp dword [nano_buf_len], 0
     jne .nds_has_existing_content
     mov esi, str_nano_welcome
     mov ah, ATTR_WHITE
-    call nano_set_status
+    call .nano_set_status
     jmp .nds_setup_cursor
 
 .nds_has_existing_content:
     mov esi, str_nano_read_ok
     mov ah, ATTR_WHITE
-    call nano_set_status
+    call .nano_set_status
 
     ; Render file text onto rows 1..21
     mov dword [cursor_x], 0
@@ -1645,7 +1645,7 @@ nano_set_status:
 
 .nano_char_done:
     mov byte [nano_is_modified], 1
-    call nano_draw_top_bar
+    call .nano_draw_top_bar
     jmp .nano_edit_loop
 
 .nano_key_backspace:
@@ -1678,7 +1678,7 @@ nano_set_status:
 
 .nano_bs_done:
     mov byte [nano_is_modified], 1
-    call nano_draw_top_bar
+    call .nano_draw_top_bar
     jmp .nano_edit_loop
 
 .nano_key_enter:
@@ -1697,16 +1697,16 @@ nano_set_status:
 
 .nano_enter_done:
     mov byte [nano_is_modified], 1
-    call nano_draw_top_bar
+    call .nano_draw_top_bar
     jmp .nano_edit_loop
 
 .nano_writeout_cmd:
     call .nano_commit_to_fs
     mov byte [nano_is_modified], 0
-    call nano_draw_top_bar
+    call .nano_draw_top_bar
     mov esi, str_nano_writeout_ok
     mov ah, ATTR_GREEN
-    call nano_set_status
+    call .nano_set_status
     jmp .nano_edit_loop
 
 .nano_exit_cmd:
@@ -1736,11 +1736,11 @@ nano_set_status:
     mov edi, VGA_TEXT + (2 * 2)
     mov esi, str_nano_title
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
     mov edi, VGA_TEXT + (34 * 2)
     mov esi, str_nano_help_title
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
 
     ; Print Help Body
     mov dword [cursor_x], 0
@@ -1757,7 +1757,7 @@ nano_set_status:
     mov edi, VGA_TEXT + ((24 * 80 + 2) * 2)
     mov esi, str_nano_help_close
     mov ah, ATTR_NANO_BAR
-    call vga_write_str_at
+    call .vga_write_str_at
 
 .nano_help_wait:
     call read_scancode_blocking
@@ -1769,41 +1769,41 @@ nano_set_status:
 .nano_whereis_cmd:
     mov esi, str_nano_whereis_msg
     mov ah, ATTR_CYAN
-    call nano_set_status
+    call .nano_set_status
     jmp .nano_edit_loop
 
 .nano_location_cmd:
     mov esi, str_nano_location_msg
     mov ah, ATTR_CYAN
-    call nano_set_status
+    call .nano_set_status
     jmp .nano_edit_loop
 
 .nano_cut_cmd:
     mov byte [nano_is_modified], 1
-    call nano_draw_top_bar
+    call .nano_draw_top_bar
     mov esi, str_nano_cut_msg
     mov ah, ATTR_YELLOW
-    call nano_set_status
+    call .nano_set_status
     jmp .nano_edit_loop
 
 .nano_paste_cmd:
     mov byte [nano_is_modified], 1
-    call nano_draw_top_bar
+    call .nano_draw_top_bar
     mov esi, str_nano_paste_msg
     mov ah, ATTR_GREEN
-    call nano_set_status
+    call .nano_set_status
     jmp .nano_edit_loop
 
 .nano_readfile_cmd:
     mov esi, str_nano_readfile_msg
     mov ah, ATTR_CYAN
-    call nano_set_status
+    call .nano_set_status
     jmp .nano_edit_loop
 
 .nano_justify_cmd:
     mov esi, str_nano_justify_msg
     mov ah, ATTR_CYAN
-    call nano_set_status
+    call .nano_set_status
     jmp .nano_edit_loop
 
 .nano_commit_to_fs:
@@ -4873,5 +4873,7 @@ out_rollback:
     db "  Swapped root Merkle pointer to 0x7a89f2e14c00b... (0 ms duration)", 0x0A
     db "  All drivers & configurations active without reboot.", 0x0A, 0
 
-; Pad kernel to exactly 71 sectors (36,352 bytes)
-times 36352 - ($ - $$) db 0
+; Pad kernel to exactly 75 sectors (38,400 bytes)
+times 38400 - ($ - $$) db 0
+
+
