@@ -12,29 +12,31 @@
 
 ## 🎥 Full System Walkthrough & Live Demo Video (with Voice Narration)
 
-A comprehensive **4.7-minute 1080p Full HD explainer video with synchronized voice narration**, architectural breakdowns, and live terminal demonstrations:
+A comprehensive **6.1-minute 1080p Full HD explainer video with synchronized voice narration**, covering **Declarative System Flakes**, **Zero-Trust Capabilities**, architectural breakdowns, and live terminal demonstrations:
 
 <p align="center">
   <a href="https://github.com/akashbiswas7074/AetherOS/raw/main/assets/ananta_overview_demo.mp4">
     <img src="assets/ananta_demo_preview.gif" alt="AnantaOS Full Video Demo Animated Preview" width="100%">
   </a>
   <br>
-  <em>▶️ <b>Click the preview above to watch / download the Full 4.7-Minute 1080p Explainer Video with Voice Narration</b> (11.7 MB, MP4)</em>
+  <em>▶️ <b>Click the preview above to watch / download the Full 6.1-Minute 1080p Explainer Video with Voice Narration</b> (14.8 MB, MP4)</em>
 </p>
 
 ▶️ **Direct Video Stream / Download:** [`assets/ananta_overview_demo.mp4`](https://github.com/akashbiswas7074/AetherOS/raw/main/assets/ananta_overview_demo.mp4)
 
 ```
-[▶️ Video Timeline & Chapter Guide]
+[▶️ Video Timeline & 11-Chapter Guide]
 0:00 - Chapter 1: Introduction & Microkernel Mission
-0:31 - Chapter 2: System Architecture & 5 Scientific Pillars
-1:09 - Chapter 3: CasFS Content-Addressed Storage & Deduplication
-1:38 - Chapter 4: Live Demo 1 — Native C Compilation & Blockchain Seal
-2:11 - Chapter 5: Live Demo 2 — Real-Time Hacker Tamper Detection [TAMPER ALERT]
-2:45 - Chapter 6: Live Demo 3 — Declarative Flakes & Instant O(1) Rollback (0.04s)
-3:16 - Chapter 7: Live Demo 4 — Universal Multi-ABI (Windows PE & macOS Mach-O)
-3:48 - Chapter 8: Live Demo 5 — GNU nano 8.0 Interactive Terminal Editor
-4:17 - Chapter 9: Research Paper Summary & Open-Source Codebase
+0:33 - Chapter 2: System Architecture & 5 Scientific Pillars
+1:11 - Chapter 3: Declarative System Flakes & Merkle Generations (flake.nix)
+1:53 - Chapter 4: CasFS Content-Addressed Storage & Deduplication
+2:22 - Chapter 5: Measured Boot & Zero-Trust Capabilities (TPM PCRs)
+3:01 - Chapter 6: Live Demo 1 — Native C Compilation & Blockchain Seal
+3:34 - Chapter 7: Live Demo 2 — Real-Time Hacker Tamper Detection [TAMPER ALERT]
+4:08 - Chapter 8: Live Demo 3 — Declarative Flakes & Instant O(1) Rollback (0.04s)
+4:39 - Chapter 9: Live Demo 4 — Universal Multi-ABI (Windows PE & macOS Mach-O)
+5:11 - Chapter 10: Live Demo 5 — GNU nano 8.0 Interactive Terminal Editor
+5:40 - Chapter 11: Research Paper Summary & Open-Source Codebase
 ```
 
 ---

@@ -181,6 +181,6 @@ fn main() {
     println!("       Zero-Trust Token: ReadStorage={}, DirectDma={} \x1b[1;32m(Least Privilege Active)\x1b[0m", has_read, has_dma);
 
     println!("\x1b[1;32m================================================================\x1b[0m");
-    println!("\x1b[1;32m  STATUS: AetherOS Running in Hyper-Speed Mode. All Security Active!\x1b[0m");
+    println!("\x1b[1;32m  STATUS: AnantaOS Running in Hyper-Speed Mode. All Security Active!\x1b[0m");
     println!("\x1b[1;32m================================================================\x1b[0m");
 }

@@ -3,17 +3,19 @@ import os
 import sys
 import json
 import subprocess
+import shutil
 
 ESPEAK_BIN = "/nix/store/hxynx1nc925j7p6ijamq9gff0ylx57jw-espeak-ng-1.52.0.1-unstable-2025-09-09/bin/espeak-ng"
 FONT_PATH = "/home/akashbiswas/.nix-profile/share/fonts/truetype/JetBrainsMonoNL-Regular.ttf"
 OUTPUT_VIDEO = "/home/akashbiswas/Desktop/operating_system/assets/ananta_overview_demo.mp4"
-TMP_DIR = "/tmp/ananta_video_build"
+PREVIEW_GIF = "/home/akashbiswas/Desktop/operating_system/assets/ananta_demo_preview.gif"
+TMP_DIR = "/tmp/ananta_video_build_v2"
 
 os.makedirs(TMP_DIR, exist_ok=True)
 
 SCENES = [
     {
-        "id": "scene1_intro",
+        "id": "scene01_intro",
         "image": "assets/ananta_logo.jpg",
         "category": "PROJECT INTRODUCTION",
         "title": "AnantaOS (अनन्त) - Next-Gen Operating System",
@@ -22,7 +24,7 @@ SCENES = [
             "Welcome to AnantaOS, a next-generation declarative microkernel operating system "
             "built from scratch in Rust and x86-64 assembly. Designed to eliminate the vulnerabilities "
             "of monolithic Unix kernels, AnantaOS introduces content-addressed storage, an immutable "
-            "blockchain audit ledger, and universal multi-binary execution."
+            "blockchain audit ledger, declarative system flakes, and universal multi-binary execution."
         ),
         "bullets": [
             "• Built from scratch to replace 50-year-old monolithic Unix kernel vulnerabilities.",
@@ -31,7 +33,7 @@ SCENES = [
         ]
     },
     {
-        "id": "scene2_arch",
+        "id": "scene02_arch",
         "image": "assets/ananta_neofetch.png",
         "category": "SYSTEM ARCHITECTURE & HARDWARE",
         "title": "Microkernel Core & 5 Scientific Pillars",
@@ -51,7 +53,27 @@ SCENES = [
         ]
     },
     {
-        "id": "scene3_casfs",
+        "id": "scene03_flakes",
+        "image": "assets/ananta_generations_rebuild.png",
+        "category": "DECLARATIVE STATE ENGINE",
+        "title": "Declarative System Flakes & Merkle Generations",
+        "subtitle": "Pure Functional Architecture with flake.nix and Zero Side Effects",
+        "voice": (
+            "Let us explore the Declarative Flake engine. In AnantaOS, your entire operating system is "
+            "defined as a pure, mathematical flake. Drivers, user profiles, and kernel configurations are "
+            "specified hermetically without mutable configuration drift. The flake engine evaluates all "
+            "components into an immutable 256-bit Merkle root. If any change causes instability, the "
+            "generational manager reverts the system pointer in forty milliseconds with mathematical certainty."
+        ),
+        "bullets": [
+            "• System Flakes model kernel, drivers, and packages as pure, deterministic functions.",
+            "• Evaluates 256-bit Merkle Root over all driver manifests and capability policies.",
+            "• Eliminates 'works on my machine' bugs and imperative /etc configuration drift.",
+            "• Generation switching and rollbacks are atomic O(1) operations with zero reinstall overhead."
+        ]
+    },
+    {
+        "id": "scene04_casfs",
         "image": "assets/ananta_blockchain_casfs.png",
         "category": "STORAGE INNOVATION",
         "title": "CasFS: Content-Addressed Filesystem",
@@ -63,13 +85,33 @@ SCENES = [
             "reducing physical disk consumption by ninety percent in benchmark workloads."
         ),
         "bullets": [
-            "• Extent-level deduplication yields 90% physical storage reduction (10x disk savings).",
+            "• Extent-level deduplication yields 90 percent physical storage reduction (10x disk savings).",
             "• Every file and folder structure is fingerprinted into a cryptographic Merkle node.",
             "• Automatic extent reuse: identical blocks require zero additional physical disk space."
         ]
     },
     {
-        "id": "scene4_gcc",
+        "id": "scene05_security",
+        "image": "assets/ananta_tamper_alert.png",
+        "category": "SECURITY & HARDWARE ATTESTATION",
+        "title": "Measured Boot & Zero-Trust Capabilities",
+        "subtitle": "TPM PCR Hardware Attestation Eliminating Ambient UID 0 Root Superpowers",
+        "voice": (
+            "AnantaOS fundamentally re-engineers operating system security. We eliminate ambient root "
+            "privileges entirely. User processes cannot execute privileged routines without unforgeable, "
+            "cryptographically signed capability tokens that enforce strict microsecond expirations. "
+            "Furthermore, a hardware TPM measured boot chain validates every stage from the assembly "
+            "bootloader to the microkernel, completely neutralizing bootkits and firmware tampering."
+        ),
+        "bullets": [
+            "• Eliminates ambient root (UID 0): Processes execute via fine-grained capability tokens.",
+            "• Hardware TPM PCR measured boot chain validates bootloader and kernel fingerprints.",
+            "• Anti-Supply-Chain verification checks binary cryptographic provenance before execution.",
+            "• Full capability sandboxing prevents privilege escalation and lateral movement."
+        ]
+    },
+    {
+        "id": "scene06_gcc",
         "image": "assets/ananta_gcc_compile.png",
         "category": "LIVE DEMO 1: NATIVE DEVELOPMENT",
         "title": "High-Performance C Compilation & Blockchain Seal",
@@ -82,12 +124,12 @@ SCENES = [
         ),
         "bullets": [
             "• Native GCC compiles matrix FFT algorithms with 0 ns translation overhead.",
-            "• 'casfs commit' calculates BLAKE3 tree hash (9b2f7a10...) across 4 tree levels.",
-            "• The compiled binary is permanently sealed into Block #15 of the Immutable Ledger."
+            "• casfs commit calculates BLAKE3 tree hash across 4 tree levels.",
+            "• The compiled binary is permanently sealed into Block Number 15 of the Immutable Ledger."
         ]
     },
     {
-        "id": "scene5_tamper",
+        "id": "scene07_tamper",
         "image": "assets/ananta_tamper_alert.png",
         "category": "LIVE DEMO 2: INTRUSION PREVENTION",
         "title": "Real-Time Hacker Tamper Detection & Quarantine",
@@ -101,13 +143,13 @@ SCENES = [
         ),
         "bullets": [
             "• Live Attack: Adversary injects shellcode payload into a verified system binary.",
-            "• 'casfs verify' immediately detects hash mismatch against sealed Block #15.",
+            "• casfs verify immediately detects hash mismatch against sealed Block Number 15.",
             "• [TAMPER ALERT] triggered: Execution blocked by Microkernel Capability Sandbox!",
             "• Forensics: Security event permanently logged to /var/log/casfs_audit.log."
         ]
     },
     {
-        "id": "scene6_rebuild",
+        "id": "scene08_rebuild",
         "image": "assets/ananta_generations_rebuild.png",
         "category": "LIVE DEMO 3: DECLARATIVE RECOVERY",
         "title": "Declarative Generations & Instant O(1) Rollback",
@@ -119,13 +161,13 @@ SCENES = [
             "atomic rollback to restore a known-good state in just 0.04 seconds."
         ),
         "bullets": [
-            "• 'ananta-rebuild list' tracks immutable system generations with Merkle root hashes.",
+            "• ananta-rebuild list tracks immutable system generations with Merkle root hashes.",
             "• Live generation switching occurs with zero downtime and no system restart required.",
             "• Instant Rollback: Flips atomic symlink pointer back to Generation 1 in 0.04 seconds!"
         ]
     },
     {
-        "id": "scene7_multiabi",
+        "id": "scene09_multiabi",
         "image": "assets/ananta_multi_abi_exec.png",
         "category": "LIVE DEMO 4: UNIVERSAL MULTI-ABI",
         "title": "Running Windows PE & macOS Mach-O Natively",
@@ -139,11 +181,11 @@ SCENES = [
         "bullets": [
             "• WinApp: Translates Win32 PE32+ (putty.exe) NT APIs directly to microkernel IPC.",
             "• MacApp: Maps 64-bit Mach-O (Calculator.app) segments with Darwin dyld emulation.",
-            "• Both execute concurrently alongside native Linux ELF64 processes with 0% VM tax."
+            "• Both execute concurrently alongside native Linux ELF64 processes with 0 percent VM tax."
         ]
     },
     {
-        "id": "scene8_nano",
+        "id": "scene10_nano",
         "image": "assets/ananta_nano_editor.png",
         "category": "LIVE DEMO 5: USER EXPERIENCE",
         "title": "Interactive GNU nano 8.0 Terminal Editor",
@@ -161,7 +203,7 @@ SCENES = [
         ]
     },
     {
-        "id": "scene9_paper",
+        "id": "scene11_paper",
         "image": "assets/ananta_logo.jpg",
         "category": "RESEARCH & CONCLUSION",
         "title": "Academic Research Paper & Open Source",
@@ -192,19 +234,17 @@ def generate_voice(idx, text):
     raw_wav = os.path.join(TMP_DIR, f"voice_{idx:02d}_raw.wav")
     clean_wav = os.path.join(TMP_DIR, f"voice_{idx:02d}.wav")
     
-    # 1. Synthesize with espeak-ng (en-us+m3 gives a clear, authoritative deep tech voice)
     cmd = [
         ESPEAK_BIN,
         "-v", "en-us+m3",
-        "-s", "142",  # Natural speech cadence
-        "-p", "45",   # Natural vocal pitch
-        "-g", "5",    # Subtle pause length
+        "-s", "142",
+        "-p", "45",
+        "-g", "5",
         text,
         "-w", raw_wav
     ]
     subprocess.run(cmd, check=True)
     
-    # 2. Process with ffmpeg audio filters for studio clarity & compression
     filter_chain = (
         "highpass=f=100,lowpass=f=7500,"
         "equalizer=f=3000:t=q:w=1:g=2.5,"
@@ -225,13 +265,12 @@ def render_scene(idx, scene):
     if os.path.exists(out_file) and os.path.getsize(out_file) > 10000:
         print(f"[CACHE] Scene {idx+1}/{len(SCENES)} already rendered. Reusing.")
         return out_file
+        
     img_path = os.path.abspath(scene["image"])
     
-    # 1. Generate Voice
     voice_wav = generate_voice(idx, scene["voice"])
     voice_dur = get_audio_duration(voice_wav)
     
-    # Pad duration: 0.6s intro lead-in, voice, and 1.2s outro pause
     lead_in = 0.6
     total_scene_dur = round(lead_in + voice_dur + 1.2, 2)
     
@@ -244,7 +283,6 @@ def render_scene(idx, scene):
     title_text = esc(scene["title"])
     sub_text = esc(scene["subtitle"])
     
-    # Bottom bullet annotations
     bullet_draws = []
     start_y = 905
     for i, b in enumerate(scene["bullets"]):
@@ -256,7 +294,6 @@ def render_scene(idx, scene):
         )
     bullets_filter = ",".join(bullet_draws)
     
-    # Subtle ambient synth pad for background music
     ambient_synth = (
         f"aevalsrc="
         f"'0.025*sin(2*PI*130.81*t)*sin(0.3*t) + "
@@ -269,7 +306,6 @@ def render_scene(idx, scene):
         f"[bg_faded][delayed_voice]amix=inputs=2:weights=1 3:dropout_transition=2[aout]"
     )
     
-    # Video layout & compositing filter
     filter_complex = (
         f"[2:v]scale=1240:680:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[scaled_img];"
         f"[0:v][scaled_img]overlay=(W-w)/2:190[ov1];"
@@ -332,15 +368,27 @@ def main():
         print("[ERROR] Final concat failed:", res.stderr[-500:])
         sys.exit(1)
         
+    # Re-generate GIF preview
+    print("[*] Re-generating animated preview GIF from master video...")
+    gif_cmd = [
+        "ffmpeg", "-y", "-i", OUTPUT_VIDEO,
+        "-vf", "fps=10,scale=800:-1:flags=lanczos",
+        "-ss", "00:01:00", "-t", "14",
+        PREVIEW_GIF
+    ]
+    subprocess.run(gif_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
     size_mb = os.path.getsize(OUTPUT_VIDEO) / (1024 * 1024)
     total_duration = get_audio_duration(OUTPUT_VIDEO)
     print(f"\n=======================================================")
-    print(f" [SUCCESS] Master Explainer Video Rendered!")
+    print(f" [SUCCESS] Complete AnantaOS Video Rendered!")
     print(f" File: {OUTPUT_VIDEO}")
     print(f" Duration: {total_duration:.1f} seconds (~{total_duration/60:.1f} minutes)")
     print(f" Size: {size_mb:.2f} MB")
     print(f" Resolution: 1920x1080 (1080p Full HD)")
-    print(f" Audio: Voiceover Narration + Ambient Electronic Synth")
+    print(f" Total Chapters: {len(SCENES)}")
+    print(f" Features: Declarative Flakes, CasFS, Blockchain, Multi-ABI, Zero-Trust")
+    print(f" Audio: Synchronized Voice Narration + Ambient Synth")
     print(f"=======================================================")
 
 if __name__ == "__main__":
