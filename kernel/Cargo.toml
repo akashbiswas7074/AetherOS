@@ -1,10 +1,10 @@
 [package]
-name = "aether-kernel"
+name = "ananta-kernel"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 casfs = { path = "../casfs" }
-aether-manifest = { path = "../manifest" }
-aether-compat = { path = "../compat" }
-aether-security = { path = "../security" }
+ananta-manifest = { path = "../manifest" }
+ananta-compat = { path = "../compat" }
+ananta-security = { path = "../security" }

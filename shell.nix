@@ -14,7 +14,7 @@ pkgs.mkShell {
 
   shellHook = ''
     echo "=================================================="
-    echo "  AetherOS Declarative Microkernel Environment    "
+    echo "  AnantaOS Declarative Microkernel Environment    "
     echo "  Rust: $(rustc --version)"
     echo "  QEMU: $(qemu-system-x86_64 --version | head -n 1)"
     echo "=================================================="

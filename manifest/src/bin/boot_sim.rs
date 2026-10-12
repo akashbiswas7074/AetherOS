@@ -1,13 +1,13 @@
 //! AetherOS Boot Sequence Simulator & Hardware Inspector
 //! Tests full boot flow: Serial -> Framebuffer -> Paging -> CasFS -> System Flake -> Multi-ABI (Linux, Windows, Mac)
 
-use aether_compat::UniversalAbiEngine;
-use aether_manifest::{DriverKind, DriverManifest, SystemFlake, UserCapability, UserProfile};
+use ananta_compat::UniversalAbiEngine;
+use ananta_manifest::{DriverKind, DriverManifest, SystemFlake, UserCapability, UserProfile};
 use casfs::{hash, CasStorageEngine};
 
 fn main() {
     println!("\x1b[1;36m================================================================\x1b[0m");
-    println!("\x1b[1;36m     *  AETHER-OS  *  v0.1.0 (Declarative Microkernel)         \x1b[0m");
+    println!("\x1b[1;36m     *  ANANTA-OS  *  v0.1.0 (Declarative Microkernel)         \x1b[0m");
     println!("\x1b[1;36m     Unique Architecture: Content-Addressed + Multi-ABI Engine  \x1b[0m");
     println!("\x1b[1;36m================================================================\x1b[0m");
 
@@ -92,7 +92,7 @@ fn main() {
     // Test Linux ELF binary execution
     let linux_elf = [0x7F, b'E', b'L', b'F', 2, 1, 1, 0, 0x90, 0x90];
     print!("       Loading Linux ELF binary: ");
-    if let aether_compat::BinaryFormat::LinuxElf { .. } = aether_compat::detect_format(&linux_elf) {
+    if let ananta_compat::BinaryFormat::LinuxElf { .. } = ananta_compat::detect_format(&linux_elf) {
         let res = abi_engine.execute(&linux_elf);
         println!("\x1b[1;32m[OK]\x1b[0m Format: Linux ELF64 -> Executed via Linuxulator Subsystem ({:?})", res);
     }
@@ -107,7 +107,7 @@ fn main() {
     win_pe[0x44] = 0x64;
     win_pe[0x45] = 0x86;
     print!("       Loading Windows PE binary: ");
-    if let aether_compat::BinaryFormat::WindowsPe { .. } = aether_compat::detect_format(&win_pe) {
+    if let ananta_compat::BinaryFormat::WindowsPe { .. } = ananta_compat::detect_format(&win_pe) {
         let res = abi_engine.execute(&win_pe);
         println!("\x1b[1;32m[OK]\x1b[0m Format: Windows PE (.exe) -> Executed via Win32/NT Subsystem ({:?})", res);
     }
@@ -115,14 +115,14 @@ fn main() {
     // Test macOS Mach-O binary execution
     let mac_macho = [0xFE, 0xED, 0xFA, 0xCF, 0x01, 0x00, 0x00, 0x07];
     print!("       Loading macOS Mach-O binary: ");
-    if let aether_compat::BinaryFormat::MacMachO { .. } = aether_compat::detect_format(&mac_macho) {
+    if let ananta_compat::BinaryFormat::MacMachO { .. } = ananta_compat::detect_format(&mac_macho) {
         let res = abi_engine.execute(&mac_macho);
         println!("\x1b[1;32m[OK]\x1b[0m Format: macOS Mach-O (.app) -> Executed via Darwin/Mach Subsystem ({:?})", res);
     }
 
     // 6. Blockchain-Grade Security Subsystem
     println!("\x1b[1;33m[SECURITY]\x1b[0m Initializing Blockchain Cryptographic Ledger & Attestation...");
-    use aether_security::{
+    use ananta_security::{
         AuditEvent, AuditEventKind, AuditLedger, CapabilityToken, MeasuredBootChain,
         PackageAttestationRegistry, permissions,
     };
@@ -130,7 +130,7 @@ fn main() {
     let mut ledger = AuditLedger::new();
     let mut boot_chain = MeasuredBootChain::new();
     let pcr_root = boot_chain.extend_measurement(
-        aether_security::AttestationStage::KernelBareMetal,
+        ananta_security::AttestationStage::KernelBareMetal,
         b"aetheros_verified_kernel_6.6",
     );
     print!("       Measured Boot PCR Digest: \x1b[1;32m");

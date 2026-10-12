@@ -11,7 +11,7 @@ use arch::cpu::hlt;
 use arch::serial::SERIAL1;
 use arch::vga::{Color, VGA_WRITER};
 use casfs::{hash, CasStorageEngine};
-use aether_manifest::{DriverKind, DriverManifest, SystemFlake, UserCapability, UserProfile};
+use ananta_manifest::{DriverKind, DriverManifest, SystemFlake, UserCapability, UserProfile};
 use mm::PhysicalFrameAllocator;
 
 #[no_mangle]
@@ -27,7 +27,7 @@ pub extern "C" fn _start() -> ! {
 
     // 3. Print Banner
     println!("================================================================");
-    println!("     *  AETHER-OS  *  v0.1.0 (Declarative Microkernel)         ");
+    println!("     *  ANANTA-OS  *  v0.1.0 (Declarative Microkernel)         ");
     println!("     Unique Architecture: Content-Addressed + Native Flakes    ");
     println!("================================================================");
 
@@ -99,21 +99,21 @@ pub extern "C" fn _start() -> ! {
 
     // 8. Universal Multi-ABI Engine (Linux POSIX + Win32 + Mach-O)
     println!("[INIT] Activating Universal Multi-ABI Engine (Linux + Windows + Mac)...");
-    let mut abi_engine = aether_compat::UniversalAbiEngine::new();
+    let mut abi_engine = ananta_compat::UniversalAbiEngine::new();
     let test_elf = [0x7F, b'E', b'L', b'F', 2, 1, 1, 0];
     let _res = abi_engine.execute(&test_elf);
     println!("       Universal ABI Dispatch active: Linux ELF execution ready.");
 
     // 9. Blockchain-Grade Security Subsystem
     println!("[SECURITY] Mounting Blockchain Audit Ledger & Measured Boot...");
-    let mut ledger = aether_security::AuditLedger::new();
-    let mut boot_chain = aether_security::MeasuredBootChain::new();
+    let mut ledger = ananta_security::AuditLedger::new();
+    let mut boot_chain = ananta_security::MeasuredBootChain::new();
     let pcr = boot_chain.extend_measurement(
-        aether_security::AttestationStage::KernelBareMetal,
-        b"aether_kernel_elf64",
+        ananta_security::AttestationStage::KernelBareMetal,
+        b"ananta_kernel_elf64",
     );
-    ledger.record_event(aether_security::AuditEvent::new(
-        aether_security::AuditEventKind::BootAttestation,
+    ledger.record_event(ananta_security::AuditEvent::new(
+        ananta_security::AuditEventKind::BootAttestation,
         "kernel",
         pcr,
         1,

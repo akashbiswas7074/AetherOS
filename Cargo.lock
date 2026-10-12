@@ -3,33 +3,33 @@
 version = 4
 
 [[package]]
-name = "aether-compat"
+name = "ananta-compat"
 version = "0.1.0"
 dependencies = [
  "casfs",
 ]
 
 [[package]]
-name = "aether-kernel"
+name = "ananta-kernel"
 version = "0.1.0"
 dependencies = [
- "aether-compat",
- "aether-manifest",
- "aether-security",
+ "ananta-compat",
+ "ananta-manifest",
+ "ananta-security",
  "casfs",
 ]
 
 [[package]]
-name = "aether-manifest"
+name = "ananta-manifest"
 version = "0.1.0"
 dependencies = [
- "aether-compat",
- "aether-security",
+ "ananta-compat",
+ "ananta-security",
  "casfs",
 ]
 
 [[package]]
-name = "aether-security"
+name = "ananta-security"
 version = "0.1.0"
 dependencies = [
  "casfs",

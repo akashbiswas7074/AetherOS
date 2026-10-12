@@ -108,10 +108,10 @@ flowchart TD
 
     subgraph Phase2 ["2. Source Compilation"]
         B --> C["nasm -f bin boot/boot.asm"]
-        B --> D["cargo build --package aether-kernel"]
-        B --> E["cargo test --package casfs --package aether-compat"]
+        B --> D["cargo build --package ananta-kernel"]
+        B --> E["cargo test --package casfs --package ananta-compat"]
         C --> F["boot.bin (512-byte MBR)"]
-        D --> G["aether-kernel (ELF64 / Kernel Binary)"]
+        D --> G["ananta-kernel (ELF64 / Kernel Binary)"]
     end
 
     subgraph Phase3 ["3. Virtual Disk Assembly"]
@@ -135,8 +135,8 @@ flowchart TD
 
 2. **Microkernel & Storage Engine Build**:
    ```bash
-   cargo build --package aether-kernel --target x86_64-unknown-none
-   cargo test --package casfs --package aether-manifest --package aether-compat
+   cargo build --package ananta-kernel --target x86_64-unknown-none
+   cargo test --package casfs --package ananta-manifest --package ananta-compat
    ```
    Builds the Rust kernel without the standard library (`no_std`), targeting bare-metal x86_64.
 

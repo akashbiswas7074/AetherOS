@@ -1,22 +1,22 @@
 .PHONY: all build check test clean run sim build-image run-vm run-vm-headless
 
-KERNEL_ELF = target/x86_64-unknown-none/debug/aether-kernel
-DISK_IMAGE = aetheros.img
+KERNEL_ELF = target/x86_64-unknown-none/debug/ananta-kernel
+DISK_IMAGE = ananta.img
 QEMU ?= $(shell which qemu-system-x86_64 2>/dev/null || echo /nix/store/gx222l0zm41h4zqrgpb07nc0brwpv3nk-qemu-11.1.0/bin/qemu-system-x86_64)
 
 all: build-image check test
 
 build:
-	cargo build --package aether-kernel
+	cargo build --package ananta-kernel
 
 check:
-	cargo check --package casfs --package aether-manifest --package aether-compat --package aether-security
+	cargo check --package casfs --package ananta-manifest --package ananta-compat --package ananta-security
 
 test:
-	cargo test --package casfs --package aether-manifest --package aether-compat --package aether-security
+	cargo test --package casfs --package ananta-manifest --package ananta-compat --package ananta-security
 
 sim:
-	cargo run --package aether-manifest --bin boot_sim
+	cargo run --package ananta-manifest --bin boot_sim
 
 # Build the real bootable OS disk image (MBR Bootloader + Protected Mode Graphical GUI Kernel)
 build-image:
@@ -48,13 +48,13 @@ run: run-linux
 run-linux:
 	@echo "=================================================================="
 	@echo "  AnantaOS Genuine Linux Environment (Kernel 6.6.142 x86_64)!"
-	@echo "  Booting directly from Persistent Hard Disk: build/aether-linux.qcow2"
+	@echo "  Booting directly from Persistent Hard Disk: build/ananta-linux.qcow2"
 	@echo "  Pre-installed Apps: nano, gcc, python3, git, neofetch"
 	@echo "  Login: root (no password)"
 	@echo "=================================================================="
 	$(QEMU) \
 		-name "AnantaOS Genuine Linux Environment" \
-		-drive file=build/aether-linux.qcow2,format=qcow2,if=virtio,file.locking=off \
+		-drive file=build/ananta-linux.qcow2,format=qcow2,if=virtio,file.locking=off \
 		-m 1024M \
 		-nic user,model=virtio-net-pci \
 		-vga std
