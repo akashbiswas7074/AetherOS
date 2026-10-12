@@ -54,7 +54,7 @@ run-linux:
 	@echo "=================================================================="
 	$(QEMU) \
 		-name "AetherOS Genuine Linux Environment" \
-		-drive file=build/aether-linux.qcow2,format=qcow2,if=virtio \
+		-drive file=build/aether-linux.qcow2,format=qcow2,if=virtio,file.locking=off \
 		-m 1024M \
 		-nic user,model=virtio-net-pci \
 		-vga std
