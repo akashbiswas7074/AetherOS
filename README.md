@@ -57,15 +57,129 @@ By building the core kernel and storage engine in **Rust**:
 
 ### 4. Blockchain-Grade Security Subsystem
 AnantaOS brings blockchain cryptography directly into kernel and userspace security:
-- **Immutable Audit Ledger**: Critical security events (logins, privilege delegations, system changes) are committed into an append-only Merkle-linked blockchain hash-chain, defeating anti-forensics attacks.
+- **Immutable Audit Ledger**: Critical security events (file creations, folder Merkle updates, privilege delegations, logins) are committed into an append-only Merkle-linked blockchain hash-chain, defeating anti-forensics attacks.
 - **Anti-Supply-Chain Attestation**: Downloaded packages are cryptographically verified against a decentralized consensus hash registry before execution, preventing malicious backdoor injection.
 - **Zero-Trust Capability Tokens**: Eliminates monolithic `root` and `sudo` vulnerabilities. Permissions are granted via cryptographically signed capability tokens with microsecond granularity and automatic expiration.
 - **Measured Boot PCR Chain**: Cumulative cryptographic measurement across BIOS, MBR, bare-metal kernel, and driver manifests to detect bootkits and unauthorized disk tampering.
 
+---
+
+## 4. Blockchain-Secured Filesystem (CasFS)
+
+Every file and directory created or modified in AnantaOS is **automatically sealed into an append-only cryptographic Merkle blockchain ledger**.
+
+### File & Folder Blockchain Protection Flow Chart
+
+| Step # | Stage | Trigger / Action | Technical Mechanism | Blockchain Security Result |
+|:---:|:---|:---|:---|:---|
+| **1** | **Creation Event** | User or app executes `mkdir <folder>` or `touch <file>` | Captured via shell hook or background `casfs-daemon` watcher | Triggers cryptographic processing before disk write finishes |
+| **2** | **Fingerprinting** | Read payload bytes of the file | Computes **BLAKE3 (256-bit)** content hash: `H = BLAKE3(Data)` | Unique cryptographic fingerprint; even a 1-bit change creates a completely different hash |
+| **3** | **Deduplication** | Check if hash exists in HAMT trie | $\mathcal{O}(1)$ Content-Address lookup in memory trie | If file exists, reference is reused (zero extra disk blocks allocated) |
+| **4** | **Folder Merkle Tree** | For directories: gather all children hashes | Aggregates child hashes into a Merkle node: `Root = BLAKE3(H1 \|\| H2 \|\| ...)` | Protects entire folder structure; adding/deleting any file alters the folder root |
+| **5** | **Event Packaging** | Format audit transaction | `FileCommitted:<path>:<hash>` or `FolderCommitted:<dir>:<root>` | Bundles timestamp, path, actor, and content hash into an immutable payload |
+| **6** | **Block Sealing** | Chain into the blockchain | `New_Hash = BLAKE3(Prev_Block_Hash \|\| Payload \|\| Height)` | Cryptographically links the new block to the genesis chain |
+| **7** | **Tamper Verification** | User or security tool runs `casfs verify <path>` | Compares current disk hash against sealed blockchain block | **PASS**: File/folder matches.<br>**ALERT**: Flagged if altered by malware/tampering |
+
+### Visual Block Architecture Chart
+
+```
+[ Your Files & Folders ]
+       │
+       ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │                   STEP 1: HASHING                       │
+ │  file1.txt   ──►  BLAKE3 Hash: 40a729a29...             │
+ │  file2.c     ──►  BLAKE3 Hash: e3b0c4429...             │
+ └────────────────────────────┬────────────────────────────┘
+                              │
+                              ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │               STEP 2: FOLDER MERKLE TREE                │
+ │  my_folder/  ──►  BLAKE3( 40a729... + e3b0c4... )       │
+ │                   Merkle Root: bda10362f...             │
+ └────────────────────────────┬────────────────────────────┘
+                              │
+                              ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │              STEP 3: BLOCKCHAIN AUDIT LEDGER            │
+ │                                                         │
+ │  ┌─────────────────┐       ┌─────────────────┐          │
+ │  │    BLOCK #1     │       │    BLOCK #2     │          │
+ │  ├─────────────────┤       ├─────────────────┤          │
+ │  │ Prev: Genesis   │       │ Prev: Block #1  │          │
+ │  │ File: flake.nix │──────►│ Folder: my_proj │──► ...   │
+ │  │ Hash: 98558f... │       │ Hash: bda103... │          │
+ │  └─────────────────┘       └─────────────────┘          │
+ │                                                         │
+ │   Chain File: /var/lib/ananta/casfs/ledger/chain        │
+ └─────────────────────────────────────────────────────────┘
+```
+
+### CasFS CLI Commands
+
+| Command | Action |
+|:---|:---|
+| `casfs commit <file_or_dir>` | Computes BLAKE3 hash, registers extent deduplication, and seals into the next blockchain audit block |
+| `casfs verify <file_or_dir>` | Cryptographic tamper check against sealed blockchain block (returns PASS or TAMPER ALERT) |
+| `casfs audit` | Inspects full blockchain audit ledger, block heights, and block hashes |
+| `casfs status` | Displays HAMT Merkle-trie indexing status, stored object count, and blockchain height |
+| `casfs auto-secure start` | Starts background watcher daemon (`casfs-daemon`) to auto-secure all newly created files & folders |
 
 ---
 
-## 4. System Architecture
+## 5. Protection from Hackers & Threats
+
+AnantaOS incorporates **Zero-Trust Microkernel Architecture** and **Cryptographic Defense-in-Depth** to neutralize modern hacker tactics.
+
+### Hacker Threat vs. AnantaOS Defense Matrix
+
+| Hacker Attack Type | How Hackers Attack Normal OS (Linux/Windows) | How AnantaOS Stops the Hacker | Built-in Ananta Defense |
+|:---|:---|:---|:---|
+| **Ransomware / File Encryption** | Silently encrypts files and overwrites blocks on disk | Encrypted files trigger an immediate hash mismatch; previous versions are preserved in immutable CasFS blocks | **CasFS + Merkle Tree Verification** |
+| **Rootkits & Kernel Tampering** | Injects malicious code into bootloader or kernel drivers | Cryptographic PCR measured boot chain validates stage fingerprints before execution | **Measured Boot Chain (TPM/PCR)** |
+| **Privilege Escalation** | Exploit bugs to gain ambient `root` (UID 0) and take over everything | AnantaOS eliminates ambient root; processes require explicit unforgeable capability tokens | **Zero-Trust Capability Tokens** |
+| **Anti-Forensics / Deleting Logs** | Hackers delete `/var/log` to erase evidence of intrusion | Logs are chained into an append-only cryptographic blockchain ledger; altering or deleting a line invalidates the whole chain | **Immutable Audit Blockchain** |
+| **Supply Chain Malware** | Inject malicious dependencies or corrupted packages | Every package requires multi-signature cryptographic provenance before loading | **Anti-Supply Chain Verification** |
+| **Zero-Day System Corruption** | System files or configurations corrupted by an exploit | Instant $\mathcal{O}(1)$ rollback reverts kernel, drivers, and user space to a clean generation | **Declarative Flake Rollback** |
+
+### The 5 Security Defense Layers
+
+```
+   [ LAYER 5: ATOMIC RECOVERY ]
+   └── Instant O(1) Rollback (ananta-rebuild rollback) reverts any infected state
+             ▲
+   [ LAYER 4: TAMPER DETECTION ]
+   └── CasFS Blockchain continuously seals & verifies file & directory Merkle trees
+             ▲
+   [ LAYER 3: ANTI-FORENSIC AUDIT ]
+   └── Append-only cryptographic ledger permanently logs all hacker activity
+             ▲
+   [ LAYER 2: ZERO-TRUST CAPABILITY ]
+   └── No root superpowers; fine-grained cryptographic tokens for each action
+             ▲
+   [ LAYER 1: MEASURED BOOT CHAIN ]
+   └── Hardware-level PCR hashes ensure the microkernel hasn't been modified
+```
+
+---
+
+## 6. Linux-like Declarative System Generations
+
+AnantaOS includes native generation management inspired by NixOS, backed by microkernel Merkle-tree state attestations:
+
+| Command | Action |
+|:---|:---|
+| `ananta-rebuild list` (or `flake list`) | Displays all system generations, timestamps, Merkle root hashes, and the current active generation |
+| `ananta-rebuild switch` (or `flake switch`) | Evaluates `/etc/flake.nix`, registers kernel drivers, seals a new generation attestation block, and switches live |
+| `ananta-rebuild rollback` (or `flake rollback`) | Instant **$\mathcal{O}(1)$ rollback** reverting the active pointer to the previous known good generation |
+
+
+
+---
+
+---
+
+## 7. System Architecture
 
 ```
 +-----------------------------------------------------------------------+
@@ -96,7 +210,7 @@ AnantaOS brings blockchain cryptography directly into kernel and userspace secur
 
 ---
 
-## 5. How AnantaOS is Built ("How to Make It")
+## 8. How AnantaOS is Built ("How to Make It")
 
 Building AnantaOS consists of a 4-phase compilation and disk generation pipeline:
 
@@ -118,7 +232,7 @@ flowchart TD
         F & G --> H["Partitioning & Formatting (qemu-img, ext4)"]
         H --> I["Deploying Kernel & EXTLINUX to /dev/vda1"]
         H --> J["Deploying Root Filesystem to /dev/vda3"]
-        I & J --> K["build/aether-linux.qcow2 (4 GB Persistent Disk)"]
+        I & J --> K["build/ananta-linux.qcow2 (4 GB Persistent Disk)"]
     end
 
     subgraph Phase4 ["4. Execution & Verification"]
@@ -136,7 +250,7 @@ flowchart TD
 2. **Microkernel & Storage Engine Build**:
    ```bash
    cargo build --package ananta-kernel --target x86_64-unknown-none
-   cargo test --package casfs --package ananta-manifest --package ananta-compat
+   cargo test --package casfs --package ananta-manifest --package ananta-compat --package ananta-security
    ```
    Builds the Rust kernel without the standard library (`no_std`), targeting bare-metal x86_64.
 
@@ -153,7 +267,7 @@ flowchart TD
 
 ---
 
-## 6. Codebase Organization
+## 9. Codebase Organization
 
 ```
 operating_system/
@@ -196,7 +310,7 @@ operating_system/
 
 ---
 
-## 7. Getting Started
+## 10. Getting Started
 
 ### Prerequisites
 
@@ -218,7 +332,7 @@ Alternatively, install the following manually on Ubuntu/Debian/Fedora/Arch:
 # Build the microkernel
 make build
 
-# Run unit tests across CasFS, Manifests, and Multi-ABI
+# Run unit tests across CasFS, Manifests, Security, and Multi-ABI
 make test
 
 # Build the bootable disk image
@@ -227,7 +341,7 @@ make build-image
 
 ---
 
-## 8. Running AnantaOS
+## 11. Running AnantaOS
 
 ### 1. Launch the 64-bit Persistent OS Environment
 To boot the full 64-bit environment with VirtIO storage, live networking, and pre-installed packages:
@@ -258,7 +372,7 @@ make run-vm
 ```
 
 ### 3. Run the Architecture Simulator & Tests
-To verify CasFS deduplication and test the declarative state pipeline:
+To verify CasFS deduplication, blockchain audit integrity, and test the declarative state pipeline:
 
 ```bash
 make sim
@@ -266,13 +380,16 @@ make sim
 
 ---
 
-## 9. Verification & Testing
+## 12. Verification & Testing
 
 The test suite validates:
 1. **BLAKE3 Hash Correctness**: Validated against standard test vectors.
 2. **HAMT Collision Handling**: Merkle tree insertion, retrieval, and edge-case collisions.
 3. **CasFS Deduplication**: Ensures zero redundant storage when identical extents are committed.
-4. **Binary Format Detection**: Validates ELF, PE, and Mach-O header parsing.
+4. **Folder Merkle Trees**: Computes hierarchical directory hashes and detects tampering.
+5. **Blockchain Audit Ledger**: Verifies chain continuity and tamper-evident blocks.
+6. **Binary Format Detection**: Validates ELF, PE, and Mach-O header parsing.
+7. **System Flake Generations**: Validates atomic $O(1)$ rollback and generation switching.
 
 Run all checks:
 ```bash
@@ -282,6 +399,7 @@ make test
 
 ---
 
-## 10. License
+## 13. License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
