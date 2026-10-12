@@ -207,4 +207,33 @@ mod tests {
         assert!(ledger.verify_integrity());
         assert_eq!(ledger.block_count, 1);
     }
+
+    #[test]
+    fn test_folder_and_file_creation_blockchain_security() {
+        let mut ledger = AuditLedger::new();
+
+        // 1. Every folder creation is secured by blockchain
+        let folder_event = AuditEvent::new(
+            AuditEventKind::DirectoryCreated,
+            "casfs_watch_daemon",
+            hash(b"/home/ananta/workspace"),
+            600,
+        );
+        ledger.record_event(folder_event);
+
+        // 2. Every file created inside the folder is secured by blockchain
+        let file_event = AuditEvent::new(
+            AuditEventKind::FileCreated,
+            "casfs_watch_daemon",
+            hash(b"hello_world.c_source_code_payload"),
+            601,
+        );
+        ledger.record_event(file_event);
+
+        // 3. Block seals and ledger verifies tamper-evidence
+        let sealed_block_hash = ledger.commit_current_block();
+        assert_ne!(sealed_block_hash, casfs::blake3::Blake3Hash::ZERO);
+        assert!(ledger.verify_integrity());
+        assert_eq!(ledger.current_block.index, 1);
+    }
 }
