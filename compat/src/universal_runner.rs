@@ -1,4 +1,4 @@
-//! Universal Multi-ABI Execution Engine for AetherOS.
+//! Universal Multi-ABI Execution Engine for AnantaOS.
 //! Executes Linux ELF, Windows PE, and macOS Mach-O binaries seamlessly.
 
 use crate::binary_format::{detect_format, BinaryFormat};

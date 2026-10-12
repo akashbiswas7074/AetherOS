@@ -1,5 +1,5 @@
 //! Windows NT & Win32 Compatibility Subsystem.
-//! Translates Windows PE system routines into AetherOS CasFS and memory structures.
+//! Translates Windows PE system routines into AnantaOS CasFS and memory structures.
 
 pub const NT_STATUS_SUCCESS: u32 = 0x00000000;
 pub const NT_STATUS_ACCESS_DENIED: u32 = 0xC0000022;
@@ -29,11 +29,11 @@ impl WindowsSubsystem {
         self.total_calls_handled += 1;
         match call {
             Win32Call::CreateFileW => {
-                // In AetherOS, Windows file paths are mapped into CasFS Content-Addressed objects
+                // In AnantaOS, Windows file paths are mapped into CasFS Content-Addressed objects
                 NT_STATUS_SUCCESS
             }
             Win32Call::VirtualAlloc => {
-                // Mapped to AetherOS frame allocator
+                // Mapped to AnantaOS frame allocator
                 NT_STATUS_SUCCESS
             }
             Win32Call::WriteFile | Win32Call::ReadFile => NT_STATUS_SUCCESS,

@@ -1,5 +1,5 @@
 //! macOS Darwin & Mach Subsystem (Darling architecture).
-//! Translates Mach messages (mach_msg) and BSD system calls into AetherOS IPC.
+//! Translates Mach messages (mach_msg) and BSD system calls into AnantaOS IPC.
 
 pub const KERN_SUCCESS: i32 = 0;
 pub const KERN_INVALID_ARGUMENT: i32 = 4;

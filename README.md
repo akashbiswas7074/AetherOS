@@ -371,12 +371,45 @@ To boot the pure assembly protected-mode kernel from the floppy disk image (`ana
 make run-vm
 ```
 
-### 3. Run the Architecture Simulator & Tests
+### 3. Installing & Running Windows Applications (.exe / .msi)
+
+AnantaOS features a **Universal Multi-ABI Subsystem** (`compat/src/windows_abi.rs`), enabling execution of Windows PE binaries directly.
+
+#### Step 1: Install Windows Runtime (Wine & Dependencies)
+Inside your running AnantaOS terminal, install the Windows compatibility environment:
+
+```bash
+apk update
+apk add wine
+```
+
+#### Step 2: Install Any Windows Application (.exe / .msi)
+To install or run any Windows program, installer, or utility:
+
+```bash
+# Run a Windows executable installer
+wine setup.exe
+
+# Or install a Windows MSI package
+wine msiexec /i installer.msi
+```
+
+#### Step 3: Run the Installed Windows Application
+Installed programs reside in the virtual Windows C: drive (`~/.wine/drive_c/`):
+
+```bash
+wine "C:\Program Files\YourApp\app.exe"
+```
+
+All files created by Windows apps are automatically fingerprinted by **BLAKE3** and sealed into the **Blockchain Audit Ledger** via `casfs-daemon`.
+
+### 4. Run the Architecture Simulator & Tests
 To verify CasFS deduplication, blockchain audit integrity, and test the declarative state pipeline:
 
 ```bash
 make sim
 ```
+
 
 ---
 

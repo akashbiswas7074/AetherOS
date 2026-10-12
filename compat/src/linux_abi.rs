@@ -1,5 +1,5 @@
 //! Linux POSIX ABI Translation Subsystem (FreeBSD Linuxulator / WSL1 architecture).
-//! Intercepts Linux syscall numbers and translates them to AetherOS microkernel calls.
+//! Intercepts Linux syscall numbers and translates them to AnantaOS microkernel calls.
 
 pub const LINUX_SYS_READ: u64 = 0;
 pub const LINUX_SYS_WRITE: u64 = 1;
