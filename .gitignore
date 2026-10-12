@@ -1,0 +1,24 @@
+# Rust target directory
+target/
+
+# OS Disk Images and virtual machine artifacts
+build/
+*.bin
+*.img
+*.iso
+*.qcow2
+*.vdi
+*.vmdk
+
+# Temporary logs and screen dumps
+*.log
+*.ppm
+*.tmp
+
+# Editor and OS caches
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/

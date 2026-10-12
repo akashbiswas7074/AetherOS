@@ -1,0 +1,9 @@
+[package]
+name = "aether-kernel"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+casfs = { path = "../casfs" }
+aether-manifest = { path = "../manifest" }
+aether-compat = { path = "../compat" }

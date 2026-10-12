@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = [
+    "kernel",
+    "casfs",
+    "manifest",
+    "compat",
+]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1
+opt-level = 3
