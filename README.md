@@ -1,8 +1,11 @@
 # AnantaOS (आकाश)
 
 > **A Declarative, Content-Addressed Microkernel Operating System & Universal Multi-ABI Runtime**
+> 
+> 📄 **Academic Research Paper Available:** [Read Full Research Paper (RESEARCH_PAPER.md)](RESEARCH_PAPER.md)
 
-**AnantaOS** (named after *Akash* / आकाश — the Sanskrit concept for *Cosmic Space / Aether*, the primordial fifth element of the Indian *Pancha Mahabhuta*) is an experimental operating system built from the ground up in **Rust** and **x86_64 Assembly**. It explores alternatives to traditional monolithic Unix kernels by combining a capability-based microkernel design, a cryptographic content-addressable storage engine (**CasFS**), and a universal multi-binary compatibility layer (**Multi-ABI**).
+**AnantaOS** (named after *Akash* / आकाश — the Sanskrit concept for *Cosmic Space / Aether*, the primordial fifth element of the Indian *Pancha Mahabhuta*) is an experimental operating system built from the ground up in **Rust** and **x86_64 Assembly**. It explores alternatives to traditional monolithic Unix kernels by combining a capability-based microkernel design, a cryptographic content-addressable storage engine (**CasFS**), an append-only **Blockchain Audit Ledger**, and a universal multi-binary compatibility layer (**Multi-ABI**).
+
 
 ---
 
