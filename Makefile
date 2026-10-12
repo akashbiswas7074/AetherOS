@@ -25,18 +25,18 @@ build-image:
 	cat boot/boot.bin kernel/kernel_gui.bin > $(DISK_IMAGE)
 	truncate -s 1440k $(DISK_IMAGE)
 	@echo "=================================================="
-	@echo "  Bootable AkashOS Disk Image Ready: $(DISK_IMAGE)"
+	@echo "  Bootable AnantaOS Disk Image Ready: $(DISK_IMAGE)"
 	@echo "=================================================="
 
-# Run AkashOS inside QEMU Virtual Machine with full Terminal Console
+# Run AnantaOS inside QEMU Virtual Machine with full Terminal Console
 run-vm: build-image
 	@echo "=================================================================="
-	@echo "  AkashOS Terminal Console Started (VGA 80x25 Mode 03h)!"
+	@echo "  AnantaOS Terminal Console Started (VGA 80x25 Mode 03h)!"
 	@echo "  Full-screen terminal interface with hardware blinking cursor."
 	@echo "  Try commands: ab, ls, cd bin, pwd, uname -a, ps aux, free -m, etc."
 	@echo "=================================================================="
 	$(QEMU) \
-		-name "AkashOS Terminal Console" \
+		-name "AnantaOS Terminal Console" \
 		-drive file=$(DISK_IMAGE),format=raw,if=floppy,file.locking=off \
 		-nic user,model=e1000,mac=52:54:00:12:34:56 \
 		-vga std \
@@ -47,13 +47,13 @@ run: run-linux
 # Run Genuine Linux Environment with Pre-installed GNU nano, GCC, Python 3, and Git
 run-linux:
 	@echo "=================================================================="
-	@echo "  AkashOS Genuine Linux Environment (Kernel 6.6.142 x86_64)!"
+	@echo "  AnantaOS Genuine Linux Environment (Kernel 6.6.142 x86_64)!"
 	@echo "  Booting directly from Persistent Hard Disk: build/aether-linux.qcow2"
 	@echo "  Pre-installed Apps: nano, gcc, python3, git, neofetch"
 	@echo "  Login: root (no password)"
 	@echo "=================================================================="
 	$(QEMU) \
-		-name "AkashOS Genuine Linux Environment" \
+		-name "AnantaOS Genuine Linux Environment" \
 		-drive file=build/aether-linux.qcow2,format=qcow2,if=virtio,file.locking=off \
 		-m 1024M \
 		-nic user,model=virtio-net-pci \

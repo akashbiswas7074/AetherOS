@@ -1,14 +1,14 @@
-# AkashOS (आकाश)
+# AnantaOS (आकाश)
 
 > **A Declarative, Content-Addressed Microkernel Operating System & Universal Multi-ABI Runtime**
 
-**AkashOS** (named after *Akash* / आकाश — the Sanskrit concept for *Cosmic Space / Aether*, the primordial fifth element of the Indian *Pancha Mahabhuta*) is an experimental operating system built from the ground up in **Rust** and **x86_64 Assembly**. It explores alternatives to traditional monolithic Unix kernels by combining a capability-based microkernel design, a cryptographic content-addressable storage engine (**CasFS**), and a universal multi-binary compatibility layer (**Multi-ABI**).
+**AnantaOS** (named after *Akash* / आकाश — the Sanskrit concept for *Cosmic Space / Aether*, the primordial fifth element of the Indian *Pancha Mahabhuta*) is an experimental operating system built from the ground up in **Rust** and **x86_64 Assembly**. It explores alternatives to traditional monolithic Unix kernels by combining a capability-based microkernel design, a cryptographic content-addressable storage engine (**CasFS**), and a universal multi-binary compatibility layer (**Multi-ABI**).
 
 ---
 
 ## 1. Languages Used Across the System
 
-AkashOS utilizes specific languages tailored to the requirements of each system layer:
+AnantaOS utilizes specific languages tailored to the requirements of each system layer:
 
 | Layer | Language | Purpose & Codebase Location |
 | :--- | :--- | :--- |
@@ -23,9 +23,9 @@ AkashOS utilizes specific languages tailored to the requirements of each system 
 
 ---
 
-## 2. How AkashOS Differs from Traditional OSes
+## 2. How AnantaOS Differs from Traditional OSes
 
-| Feature | Traditional Linux (Ubuntu / Debian) | Alpine Linux | AkashOS |
+| Feature | Traditional Linux (Ubuntu / Debian) | Alpine Linux | AnantaOS |
 | :--- | :--- | :--- | :--- |
 | **Kernel Architecture** | Monolithic (drivers, storage, network all inside kernel space) | Monolithic | **Declarative Microkernel Design** (isolated core with user-space services) |
 | **Filesystem Model** | Inode-based block filesystems (ext4, XFS, Btrfs) | Inode-based (ext4) | **CasFS (Content-Addressable Storage Engine)** indexed by cryptographic **BLAKE3 hashes** |
@@ -56,7 +56,7 @@ By building the core kernel and storage engine in **Rust**:
 - Assembly is restricted only to hardware bootstrapping where direct CPU register control is strictly mandatory.
 
 ### 4. Blockchain-Grade Security Subsystem
-AkashOS brings blockchain cryptography directly into kernel and userspace security:
+AnantaOS brings blockchain cryptography directly into kernel and userspace security:
 - **Immutable Audit Ledger**: Critical security events (logins, privilege delegations, system changes) are committed into an append-only Merkle-linked blockchain hash-chain, defeating anti-forensics attacks.
 - **Anti-Supply-Chain Attestation**: Downloaded packages are cryptographically verified against a decentralized consensus hash registry before execution, preventing malicious backdoor injection.
 - **Zero-Trust Capability Tokens**: Eliminates monolithic `root` and `sudo` vulnerabilities. Permissions are granted via cryptographically signed capability tokens with microsecond granularity and automatic expiration.
@@ -82,7 +82,7 @@ AkashOS brings blockchain cryptography directly into kernel and userspace securi
                                     | Microkernel IPC
                                     v
 +-----------------------------------------------------------------------+
-|               AkashOS Microkernel & Core Subsystems                  |
+|               AnantaOS Microkernel & Core Subsystems                  |
 |  - Physical Frame Allocator (mm/)     - Zero-Copy Ring Buffer IPC     |
 |  - CasFS Engine (BLAKE3 + HAMT)       - Declarative Flake Manifest    |
 |  - x86_64 CPU Context Switcher        - VirtIO Block & Net Drivers    |
@@ -96,9 +96,9 @@ AkashOS brings blockchain cryptography directly into kernel and userspace securi
 
 ---
 
-## 5. How AkashOS is Built ("How to Make It")
+## 5. How AnantaOS is Built ("How to Make It")
 
-Building AkashOS consists of a 4-phase compilation and disk generation pipeline:
+Building AnantaOS consists of a 4-phase compilation and disk generation pipeline:
 
 ```mermaid
 flowchart TD
@@ -143,7 +143,7 @@ flowchart TD
 3. **Disk Image Packaging**:
    - Creates a 4 GB grow-on-demand virtual disk (`qcow2`).
    - Formats boot and root partitions (`ext4`).
-   - Configures the bootloader (`extlinux.conf`) with AkashOS kernel parameters.
+   - Configures the bootloader (`extlinux.conf`) with AnantaOS kernel parameters.
 
 4. **Booting**:
    ```bash
@@ -227,7 +227,7 @@ make build-image
 
 ---
 
-## 8. Running AkashOS
+## 8. Running AnantaOS
 
 ### 1. Launch the 64-bit Persistent OS Environment
 To boot the full 64-bit environment with VirtIO storage, live networking, and pre-installed packages:
@@ -251,7 +251,7 @@ Inside the booted terminal:
   ```
 
 ### 2. Launch the Standalone Low-Level Terminal
-To boot the pure assembly protected-mode kernel from the floppy disk image (`akashos.img`):
+To boot the pure assembly protected-mode kernel from the floppy disk image (`ananta.img`):
 
 ```bash
 make run-vm
