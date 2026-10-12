@@ -375,35 +375,48 @@ make run-vm
 
 AnantaOS features a **Universal Multi-ABI Subsystem** (`compat/src/windows_abi.rs`), enabling execution of Windows PE binaries directly.
 
-#### Step 1: Install Windows Runtime (Wine & Dependencies)
-Inside your running AnantaOS terminal, install the Windows compatibility environment:
+#### Step 1: Pre-installed Windows Runtime & Apps
+Wine 9.0 and pre-installed Windows applications are pre-configured inside `build/ananta-linux.qcow2`:
+- **PuTTY (`putty.exe`)**: Located at `/opt/windows_apps/putty.exe` and `C:\Program Files\PuTTY\`
+- **Windows Built-in Tools**: `winapp notepad`, `winapp cmd`, `winapp explorer`, `winapp regedit`
 
+#### Step 2: Running Any Windows Application (.exe / .msi)
 ```bash
-apk update
-apk add wine
-```
+# Launch pre-installed Windows application:
+winapp /opt/windows_apps/putty.exe
 
-#### Step 2: Install Any Windows Application (.exe / .msi)
-To install or run any Windows program, installer, or utility:
-
-```bash
-# Run a Windows executable installer
-wine setup.exe
-
-# Or install a Windows MSI package
-wine msiexec /i installer.msi
-```
-
-#### Step 3: Run the Installed Windows Application
-Installed programs reside in the virtual Windows C: drive (`~/.wine/drive_c/`):
-
-```bash
-wine "C:\Program Files\YourApp\app.exe"
+# Or run any custom Windows installer:
+winapp setup.exe
 ```
 
 All files created by Windows apps are automatically fingerprinted by **BLAKE3** and sealed into the **Blockchain Audit Ledger** via `casfs-daemon`.
 
-### 4. Run the Architecture Simulator & Tests
+---
+
+### 4. Running Apple macOS Applications (Mach-O / .app Bundles)
+
+AnantaOS features native **macOS Darwin Mach-O Subsystem** (`compat/src/macos_abi.rs`), allowing execution of 64-bit Mach-O binaries and `.app` bundles directly.
+
+#### Step 1: Pre-installed macOS Apps
+- **Mach-O 64-bit Binary**: `/opt/mac_apps/hello_darwin.macho` (Header `0xFEEDFACF`)
+- **macOS App Bundle**: `/opt/mac_apps/Calculator.app` (`Contents/MacOS/Calculator` + `Info.plist`)
+
+#### Step 2: Running macOS Applications
+Use the native `macapp` (or `ananta-macapp`) launcher:
+
+```bash
+# Run 64-bit Mach-O binary:
+macapp /opt/mac_apps/hello_darwin.macho
+
+# Run complete macOS .app bundle:
+macapp /opt/mac_apps/Calculator.app
+```
+
+Whenever a macOS binary or bundle is executed, `macapp` automatically commits its cryptographic Merkle tree into the **Blockchain Audit Ledger** and verifies its integrity before execution.
+
+---
+
+### 5. Run the Architecture Simulator & Tests
 To verify CasFS deduplication, blockchain audit integrity, and test the declarative state pipeline:
 
 ```bash
