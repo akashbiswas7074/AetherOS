@@ -1,5 +1,5 @@
 ; =============================================================================
-; AetherOS 32-bit Protected Mode Interactive Terminal Microkernel
+; AkashOS 32-bit Protected Mode Interactive Terminal Microkernel
 ; Authentic Full-Screen 80x25 Linux Console (VGA 0xB8000)
 ; Features: Blinking Cursor, Tokenized Dispatcher, Hierarchical Filesystem,
 ; Linux Developer Apps: nano, vim, git, gcc, python, curl, tree, htop, apt/nix
@@ -4147,7 +4147,7 @@ cwd_display         db "~", 0
 ; Dynamic File System Storage Table
 fs_table            times (MAX_FS_ENTRIES * FS_ENTRY_SIZE) db 0
 
-str_prompt_user     db "akash@aetheros:", 0
+str_prompt_user     db "akash@akashos:", 0
 str_prompt_dollar   db "$ ", 0
 
 ; Command Identifiers
@@ -4341,11 +4341,11 @@ out_history:
     db " 11  git status", 0x0A, 0
 
 out_neofetch:
-    db "       /\         akash@aetheros", 0x0A
-    db "      /  \        OS: AetherOS 0.1.0-alpha x86_64", 0x0A
+    db "       /\         akash@akashos", 0x0A
+    db "      /  \        OS: AkashOS 0.1.0-alpha x86_64", 0x0A
     db "     /\   \       Host: Microkernel Baremetal / QEMU", 0x0A
-    db "    /  \   \      Kernel: 6.6.0-aether (Multi-ABI)", 0x0A
-    db "   /    \   \     Shell: ash (Aether Shell)", 0x0A
+    db "    /  \   \      Kernel: 6.6.0-akash (Multi-ABI)", 0x0A
+    db "   /    \   \     Shell: ash (Akash Shell)", 0x0A
     db "  /  /\  \   \    Storage: CasFS (BLAKE3 + HAMT)", 0x0A
     db " /__/  \__\___\   Compositor: Hyprland (Wayland)", 0x0A
     db "                  Memory: 768MB / 8192MB", 0x0A, 0
@@ -4424,7 +4424,7 @@ str_flag_small_h        db "-h", 0
 out_nano_version:
     db " GNU nano, version 8.0", 0x0A
     db " (C) 1999-2024 the GNU nano team and various contributors", 0x0A
-    db " Compiled with CasFS BLAKE3 & Linux Universal Multi-ABI on AetherOS x86_64", 0x0A
+    db " Compiled with CasFS BLAKE3 & Linux Universal Multi-ABI on AkashOS x86_64", 0x0A
     db " Email: nano@nano-editor.org    Web: https://nano-editor.org/", 0x0A
     db " Option support: --boldtext --duplicate --color --extra --multibuffer --nanorc", 0x0A, 0
 
@@ -4459,7 +4459,7 @@ out_gcc_comp2       db "' with CasFS BLAKE3 optimization...", 0x0A
                     db "[GCC] Emitting x86_64 machine code -> Linked executable './a.out'", 0x0A, 0
 
 ; Python 3 REPL Strings
-out_py_banner       db "Python 3.12.3 (main, Oct 12 2026, 20:00:00) [GCC 13.2.0] on aetheros", 0x0A
+out_py_banner       db "Python 3.12.3 (main, Oct 12 2026, 20:00:00) [GCC 13.2.0] on akashos", 0x0A
                     db 'Type "help", "copyright", "credits" or "license" for more information.', 0x0A, 0
 str_py_prompt       db ">>> ", 0
 str_py_exit1        db "exit()", 0
@@ -4470,12 +4470,12 @@ str_py_help         db "help", 0
 str_py_print        db "print(", 0
 str_py_div_zero     db "ZeroDivisionError: division by zero", 0x0A, 0
 str_py_err_syntax   db "SyntaxError: invalid syntax", 0x0A, 0
-out_py_help_text    db "AetherOS Python 3.12 Interactive Engine", 0x0A
+out_py_help_text    db "AkashOS Python 3.12 Interactive Engine", 0x0A
                     db "  * Supports arithmetic: +, -, *, / (e.g. 2+2, 10*5, 100-35)", 0x0A
                     db "  * Functions: print('text'), exit(), quit()", 0x0A, 0
 
 ; Package Manager Strings
-out_pkg_install1    db "> [AetherOS Package Engine] Fetching official package...", 0x0A
+out_pkg_install1    db "> [AkashOS Package Engine] Fetching official package...", 0x0A
                     db "  * Cryptographic signature: BLAKE3 Merkle Root [VERIFIED]", 0x0A
                     db "  * Universal ABI: Linux ELF64 registered", 0x0A
                     db "  * Installing '", 0
@@ -4486,10 +4486,10 @@ out_pkg_help        db "Usage: apk add <package> | pkg install <package> | apt i
                     db "Official apps: nano, gcc, python3, git, neofetch, make, htop", 0x0A, 0
 
 out_curl            db "HTTP/2 200 OK", 0x0A
-                    db "server: AetherOS-Edge/1.0", 0x0A
+                    db "server: AkashOS-Edge/1.0", 0x0A
                     db "content-type: text/plain; charset=utf-8", 0x0A
-                    db "content-length: 38", 0x0A, 0x0A
-                    db "Hello from AetherOS Universal Network!", 0x0A, 0
+                    db "content-length: 37", 0x0A, 0x0A
+                    db "Hello from AkashOS Universal Network!", 0x0A, 0
 
 str_tree_root       db ".", 0x0A, 0
 str_tree_branch     db "|-- ", 0
@@ -4612,8 +4612,8 @@ out_bt_disc_key      db "[CHG] Device 70:88:6B:44:12:88 Connected: no", 0x0A
 out_bt_disc_mou      db "[CHG] Device E0:D5:5E:66:33:10 Connected: no", 0x0A
                      db "Disconnection successful", 0x0A, 0
 
-out_bt_ctrl_head     db "[bluetooth]# Controller 00:1A:7D:DA:71:13 Aether-Host [default]", 0x0A
-                     db "  Name: AetherOS BlueZ 5.72 | Alias: aetheros", 0x0A, 0
+out_bt_ctrl_head     db "[bluetooth]# Controller 00:1A:7D:DA:71:13 Akash-Host [default]", 0x0A
+                     db "  Name: AkashOS BlueZ 5.72 | Alias: akashos", 0x0A, 0
 out_bt_powered_str   db "  Powered: ", 0
 out_bt_ctrl_tail     db " | Discoverable: yes | Pairable: yes", 0x0A, 0
 out_bt_dev1_label    db "  Device F4:4E:FC:21:99:02 Sony WH-1000XM5 Connected: ", 0
@@ -4650,7 +4650,7 @@ str_pci_desc_unk     db "Unknown PCI Device", 0x0A, 0
 ; Output Texts
 banner_text:
     db "================================================================================", 0x0A
-    db "  AetherOS 0.1.0-alpha (x86_64-unknown-none) [Declarative Microkernel Shell]    ", 0x0A
+    db "  AkashOS 0.1.0-alpha (x86_64-unknown-none) [Declarative Microkernel Shell]    ", 0x0A
     db "  * CasFS Storage: BLAKE3 256-bit + HAMT (O(1) Extent Deduplication) Active    ", 0x0A
     db "  * Network: NetworkManager 1.44 (Wi-Fi 6 + Eth) | Bluetooth: BlueZ 5.72       ", 0x0A
     db "  * Installed Apps: nano, vim, git, gcc, python3, curl, tree, htop, nmcli, bt   ", 0x0A
@@ -4673,7 +4673,7 @@ out_help:
     db "  curl <url>         Transfer URL data via HTTP/2 and TLS 1.3", 0x0A
     db "  tree               List contents of directories in a tree-like format", 0x0A
     db "  htop               Interactive real-time microkernel process viewer", 0x0A
-    db "  apt / nix-env      Declarative package manager for AetherOS", 0x0A
+    db "  apt / nix-env      Declarative package manager for AkashOS", 0x0A
     db "  ls [dir]           List files (try: ls, ls bin, ls etc, ls proc, ls hypr)", 0x0A
     db "  cd <dir>           Change directory (~, .., /, bin, etc, proc, hypr, <dir>)", 0x0A
     db "  pwd                Print current working directory", 0x0A
@@ -4777,14 +4777,14 @@ out_ls_hypr:
     db "-rw-r--r-- 1 akash users  256 Oct 12 20:00 kitty.conf", 0x0A, 0
 
 out_uname:
-    db "Linux aetheros 6.6.0-aether #1 SMP PREEMPT_DYNAMIC Sun Oct 12 2026 x86_64 GNU/Linux", 0x0A, 0
+    db "Linux akashos 6.6.0-akash #1 SMP PREEMPT_DYNAMIC Sun Oct 12 2026 x86_64 GNU/Linux", 0x0A, 0
 
 out_whoami:
     db "akash (uid=1000 gid=1000 groups=1000(akash),100(users),995(compositor))", 0x0A
     db "Granted Capabilities: [ReadObject(BLAKE3), DisplaySurface(Wayland)]", 0x0A, 0
 
 out_cat_notes:
-    db "=== AetherOS System Manifest & CasFS Storage Engine ===", 0x0A
+    db "=== AkashOS System Manifest & CasFS Storage Engine ===", 0x0A
     db "1. Native Multi-ABI translation: Linux ELF, Win32 PE, macOS Mach-O.", 0x0A
     db "2. CasFS Content-Addressed storage with BLAKE3 256-bit cryptographic deduplication.", 0x0A
     db "3. Zero Unix root exploits: Capabilities granted mathematically per-user.", 0x0A
@@ -4792,9 +4792,9 @@ out_cat_notes:
 
 out_cat_flake:
     db "{", 0x0A
-    db "  description = ", 0x22, "AetherOS System Flake & Home-Manager Configuration", 0x22, ";", 0x0A
+    db "  description = ", 0x22, "AkashOS System Flake & Home-Manager Configuration", 0x22, ";", 0x0A
     db "  outputs = { self, nixpkgs }: {", 0x0A
-    db "    nixosConfigurations.aetheros = nixpkgs.lib.nixosSystem {", 0x0A
+    db "    nixosConfigurations.akashos = nixpkgs.lib.nixosSystem {", 0x0A
     db "      system = ", 0x22, "x86_64-linux", 0x22, ";", 0x0A
     db "      modules = [ ./manifest.nix ./casfs.nix ./hyprland.nix ];", 0x0A
     db "    };", 0x0A
@@ -4809,10 +4809,10 @@ out_cat_hypr:
     db "exec-once = waybar & kitty", 0x0A, 0
 
 out_cat_os_rel:
-    db "NAME=", 0x22, "AetherOS", 0x22, 0x0A
+    db "NAME=", 0x22, "AkashOS", 0x22, 0x0A
     db "VERSION=", 0x22, "0.1.0-alpha (Nix Flake Gen #1)", 0x22, 0x0A
-    db "ID=aetheros", 0x0A
-    db "PRETTY_NAME=", 0x22, "AetherOS 0.1.0-alpha (x86_64)", 0x22, 0x0A, 0
+    db "ID=akashos", 0x0A
+    db "PRETTY_NAME=", 0x22, "AkashOS 0.1.0-alpha (x86_64)", 0x22, 0x0A, 0
 
 out_cat_cpuinfo:
     db "model name : QEMU Virtual CPU (x86_64 SMP, 4 Cores, 3.2 GHz)", 0x0A

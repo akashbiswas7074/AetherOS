@@ -1,5 +1,5 @@
 ; =============================================================================
-; AetherOS MBR Stage 1 Bootloader
+; AkashOS MBR Stage 1 Bootloader
 ; Switches to Graphics Mode 13h, loads kernel from disk, enters Protected Mode
 ; =============================================================================
 
