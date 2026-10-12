@@ -175,4 +175,36 @@ mod tests {
         assert!(boot_chain.verify_state(pcr_drivers));
         assert!(!boot_chain.verify_state(pcr_kernel));
     }
+
+    #[test]
+    fn test_blockchain_secured_filesystem() {
+        let mut ledger = AuditLedger::new();
+
+        // 1. Commit file into filesystem and log to blockchain
+        let file_data = b"system_critical_config=ananta_secure_v1";
+        let file_hash = hash(file_data);
+
+        let file_event = AuditEvent::new(
+            AuditEventKind::FileCommitted,
+            "casfs_engine",
+            file_hash,
+            500,
+        );
+        ledger.record_event(file_event);
+
+        // 2. Switch system generation and log to blockchain
+        let gen_event = AuditEvent::new(
+            AuditEventKind::GenerationSwitched,
+            "flake_manager",
+            hash(b"generation_2_manifest_root"),
+            510,
+        );
+        ledger.record_event(gen_event);
+
+        // 3. Seal block and verify tamper-evidence
+        let sealed_hash = ledger.commit_current_block();
+        assert_ne!(sealed_hash, casfs::blake3::Blake3Hash::ZERO);
+        assert!(ledger.verify_integrity());
+        assert_eq!(ledger.block_count, 1);
+    }
 }

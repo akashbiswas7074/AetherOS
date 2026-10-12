@@ -14,6 +14,8 @@ pub enum AuditEventKind {
     CapabilityGranted,
     IntegrityAlert,
     SyscallDenied,
+    FileCommitted,
+    GenerationSwitched,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
