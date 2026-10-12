@@ -14,7 +14,15 @@
 
 A comprehensive **4.7-minute 1080p Full HD explainer video with synchronized voice narration**, architectural breakdowns, and live terminal demonstrations:
 
-▶️ **Watch / Download Video:** [`assets/ananta_overview_demo.mp4`](assets/ananta_overview_demo.mp4) *(11.7 MB, 1080p 30fps, Full Voiceover + Ambient Synth)*
+<p align="center">
+  <a href="https://github.com/akashbiswas7074/AetherOS/raw/main/assets/ananta_overview_demo.mp4">
+    <img src="assets/ananta_demo_preview.gif" alt="AnantaOS Full Video Demo Animated Preview" width="100%">
+  </a>
+  <br>
+  <em>▶️ <b>Click the preview above to watch / download the Full 4.7-Minute 1080p Explainer Video with Voice Narration</b> (11.7 MB, MP4)</em>
+</p>
+
+▶️ **Direct Video Stream / Download:** [`assets/ananta_overview_demo.mp4`](https://github.com/akashbiswas7074/AetherOS/raw/main/assets/ananta_overview_demo.mp4)
 
 ```
 [▶️ Video Timeline & Chapter Guide]
