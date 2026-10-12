@@ -10,6 +10,27 @@
 
 **AnantaOS** (named after *Akash* / आकाश — the Sanskrit concept for *Cosmic Space / Aether*, the primordial fifth element of the Indian *Pancha Mahabhuta*) is an experimental operating system built from the ground up in **Rust** and **x86_64 Assembly**. It explores alternatives to traditional monolithic Unix kernels by combining a capability-based microkernel design, a cryptographic content-addressable storage engine (**CasFS**), an append-only **Blockchain Audit Ledger**, and a universal multi-binary compatibility layer (**Multi-ABI**).
 
+## 🎥 Full System Walkthrough & Live Demo Video (with Voice Narration)
+
+A comprehensive **4.7-minute 1080p Full HD explainer video with synchronized voice narration**, architectural breakdowns, and live terminal demonstrations:
+
+▶️ **Watch / Download Video:** [`assets/ananta_overview_demo.mp4`](assets/ananta_overview_demo.mp4) *(11.7 MB, 1080p 30fps, Full Voiceover + Ambient Synth)*
+
+```
+[▶️ Video Timeline & Chapter Guide]
+0:00 - Chapter 1: Introduction & Microkernel Mission
+0:31 - Chapter 2: System Architecture & 5 Scientific Pillars
+1:09 - Chapter 3: CasFS Content-Addressed Storage & Deduplication
+1:38 - Chapter 4: Live Demo 1 — Native C Compilation & Blockchain Seal
+2:11 - Chapter 5: Live Demo 2 — Real-Time Hacker Tamper Detection [TAMPER ALERT]
+2:45 - Chapter 6: Live Demo 3 — Declarative Flakes & Instant O(1) Rollback (0.04s)
+3:16 - Chapter 7: Live Demo 4 — Universal Multi-ABI (Windows PE & macOS Mach-O)
+3:48 - Chapter 8: Live Demo 5 — GNU nano 8.0 Interactive Terminal Editor
+4:17 - Chapter 9: Research Paper Summary & Open-Source Codebase
+```
+
+---
+
 ## 📸 Live System Activities & Real Workflows
 
 Below are real, unedited VGA framebuffer captures taken directly from active workloads running inside the **AnantaOS** microkernel environment:
