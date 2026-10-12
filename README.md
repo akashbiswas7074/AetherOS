@@ -1,10 +1,19 @@
 # AnantaOS (आकाश)
 
+<p align="center">
+  <img src="assets/ananta_logo.jpg" alt="AnantaOS Hero Banner" width="100%">
+</p>
+
 > **A Declarative, Content-Addressed Microkernel Operating System & Universal Multi-ABI Runtime**
 > 
 > 📄 **Academic Research Paper Available:** [Read Full Research Paper (RESEARCH_PAPER.md)](RESEARCH_PAPER.md)
 
 **AnantaOS** (named after *Akash* / आकाश — the Sanskrit concept for *Cosmic Space / Aether*, the primordial fifth element of the Indian *Pancha Mahabhuta*) is an experimental operating system built from the ground up in **Rust** and **x86_64 Assembly**. It explores alternatives to traditional monolithic Unix kernels by combining a capability-based microkernel design, a cryptographic content-addressable storage engine (**CasFS**), an append-only **Blockchain Audit Ledger**, and a universal multi-binary compatibility layer (**Multi-ABI**).
+
+<p align="center">
+  <img src="assets/ananta_neofetch.png" alt="AnantaOS Live Terminal Screenshot with Neofetch" width="95%">
+</p>
+
 
 
 ---
@@ -76,6 +85,10 @@ For the complete theoretical formulation, mathematical proofs, and extended eval
 ---
 
 ## 4. Blockchain-Secured Filesystem (CasFS)
+
+<p align="center">
+  <img src="assets/ananta_blockchain_casfs.png" alt="AnantaOS CasFS Blockchain Audit Ledger Live Screenshot" width="95%">
+</p>
 
 Every file and directory created or modified in AnantaOS is **automatically sealed into an append-only cryptographic Merkle blockchain ledger**.
 
@@ -383,6 +396,10 @@ make run-vm
 ```
 
 ### 3. Installing & Running Windows Applications (.exe / .msi)
+
+<p align="center">
+  <img src="assets/ananta_multi_abi.png" alt="AnantaOS Multi-ABI Cross-Platform Execution Live Screenshot" width="95%">
+</p>
 
 AnantaOS features a **Universal Multi-ABI Subsystem** (`compat/src/windows_abi.rs`), enabling execution of Windows PE binaries directly.
 
