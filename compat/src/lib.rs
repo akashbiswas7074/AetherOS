@@ -3,12 +3,17 @@
 pub mod binary_format;
 pub mod linux_abi;
 pub mod macos_abi;
+pub mod package_manager;
 pub mod universal_runner;
 pub mod windows_abi;
 
 pub use binary_format::{detect_format, BinaryFormat};
 pub use linux_abi::LinuxSubsystem;
 pub use macos_abi::MacSubsystem;
+pub use package_manager::{
+    detect_package_format, PackageDetection, PackageEcosystem, PackageManifest,
+    UniversalPackageManager,
+};
 pub use universal_runner::{ExecutionResult, UniversalAbiEngine};
 pub use windows_abi::WindowsSubsystem;
 
@@ -103,5 +108,75 @@ mod tests {
         let macho = [0xFE, 0xED, 0xFA, 0xCF];
         let res_mac = engine.execute(&macho);
         assert_eq!(res_mac, ExecutionResult::MacSuccess(0));
+    }
+
+    #[test]
+    fn test_detect_debian_deb_package() {
+        // Debian .deb starts with ar archive "!<arch>\n"
+        let deb_header = b"!<arch>\ndebian-binary   1712000000  0     0     100644  4         `\n2.0\n";
+        let detection = detect_package_format(deb_header);
+        assert_eq!(detection, PackageDetection::DebianDeb);
+    }
+
+    #[test]
+    fn test_detect_arch_aur_package() {
+        // Arch Linux .pkg.tar.zst starts with Zstandard magic
+        let arch_zst = [0x28, 0xB5, 0x2F, 0xFD, 0x00, 0x00, 0x00, 0x00];
+        let detection = detect_package_format(&arch_zst);
+        assert_eq!(detection, PackageDetection::ArchPkgTar);
+    }
+
+    #[test]
+    fn test_detect_nix_store_package() {
+        let nix_path = b"/nix/store/a1b2c3d4-neovim-0.10.0/bin/nvim";
+        let detection = detect_package_format(nix_path);
+        assert_eq!(detection, PackageDetection::NixDerivation);
+    }
+
+    #[test]
+    fn test_universal_package_manager_cross_distro() {
+        let mut pm = UniversalPackageManager::new();
+        assert!(pm.glibc_layer_active);
+
+        // 1. Install Debian package
+        let deb_hash = casfs::blake3::hash(b"debian_curl_binary_payload");
+        let mut deb_pkg = PackageManifest::new(
+            "curl",
+            "8.5.0-deb",
+            PackageEcosystem::DebianApt,
+            deb_hash,
+            true, // Requires glibc
+        );
+        deb_pkg.add_binary("/usr/bin/curl");
+        assert!(pm.install_package(deb_pkg));
+
+        // 2. Install Arch / AUR package
+        let arch_hash = casfs::blake3::hash(b"arch_htop_binary_payload");
+        let mut arch_pkg = PackageManifest::new(
+            "htop",
+            "3.3.0-arch",
+            PackageEcosystem::ArchAur,
+            arch_hash,
+            true,
+        );
+        arch_pkg.add_binary("/usr/bin/htop");
+        assert!(pm.install_package(arch_pkg));
+
+        // 3. Install Nix store package
+        let nix_hash = casfs::blake3::hash(b"nix_ripgrep_binary_payload");
+        let mut nix_pkg = PackageManifest::new(
+            "ripgrep",
+            "14.1.0-nix",
+            PackageEcosystem::NixStore,
+            nix_hash,
+            false,
+        );
+        nix_pkg.add_binary("/nix/store/rg");
+        assert!(pm.install_package(nix_pkg));
+
+        assert_eq!(pm.package_count, 3);
+        assert!(pm.verify_package_integrity("curl", b"debian_curl_binary_payload"));
+        assert!(pm.verify_package_integrity("htop", b"arch_htop_binary_payload"));
+        assert!(!pm.verify_package_integrity("htop", b"tampered_attacker_payload"));
     }
 }

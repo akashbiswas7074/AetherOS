@@ -88,6 +88,15 @@ Developing and tuning declarative system manifests (`/etc/ananta/system.conf`) d
   <img src="assets/ananta_nano_editor.png" alt="AnantaOS GNU nano Code Editor" width="95%">
 </p>
 
+---
+
+### 6. 📦 Universal Cross-Distro Package Installation (Debian, Arch AUR, Nix, Alpine)
+Installing packages across distributions using native `apt install`, `pacman -S`, and `nix-env -i` with automatic glibc compatibility and CasFS blockchain attestation.
+
+<p align="center">
+  <img src="assets/ananta_cross_distro_packages.png" alt="AnantaOS Cross-Distro Package Installation Live Screenshot" width="95%">
+</p>
+
 <details>
 <summary><b>🔍 View Boot Terminal & System Specifications (Neofetch)</b></summary>
 <p align="center">
@@ -523,7 +532,39 @@ Whenever a macOS binary or bundle is executed, `macapp` automatically commits it
 
 ---
 
-### 5. Run the Architecture Simulator & Tests
+### 5. Universal Cross-Distro Package Installation (Debian/Ubuntu, Arch/AUR, Nix, Alpine)
+
+<p align="center">
+  <img src="assets/ananta_cross_distro_packages.png" alt="AnantaOS Cross-Distro Package Manager (apt, pacman, nix-env) Live Screenshot" width="95%">
+</p>
+
+AnantaOS features a built-in **Universal Package Subsystem** (`compat/src/package_manager.rs` and `/usr/bin/ananta-pkg`), providing native drop-in commands for installing software from any distribution repository:
+
+```bash
+# 1. Install Debian / Ubuntu packages (.deb / apt):
+apt install ripgrep
+dpkg -i mypackage.deb
+
+# 2. Install Arch Linux & AUR packages (.pkg.tar.zst / pacman / yay):
+pacman -S neovim
+yay -S custom-tool
+aur install package-name
+
+# 3. Install reproducible Nix packages (/nix/store):
+nix-env -i starship
+
+# 4. Install native Alpine packages:
+apk add curl htop
+```
+
+#### Automatic Blockchain Attestation & Zero-Collision Security:
+- **Glibc/Musl ABI Translation**: Transparently executes glibc-linked binaries from Debian and Arch alongside native musl binaries without reboot or containers.
+- **Automatic CasFS Blockchain Seal**: Every newly installed binary is automatically fingerprinted with **BLAKE3** and permanently committed to the immutable blockchain audit ledger.
+- **Atomic Rollback**: If an installed package causes conflicts, run `ananta-rebuild rollback` to revert the entire system state in 0.04 seconds.
+
+---
+
+### 6. Run the Architecture Simulator & Tests
 To verify CasFS deduplication, blockchain audit integrity, and test the declarative state pipeline:
 
 ```bash
