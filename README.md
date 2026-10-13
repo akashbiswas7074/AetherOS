@@ -573,6 +573,9 @@ apk add curl htop
 | **Alpine Linux** | `https://dl-cdn.alpinelinux.org/alpine/` | `.apk` (tar.gz) | Musl libc native |
 
 #### Automatic Blockchain Attestation & Zero-Collision Security:
+- **Real-Time Dynamic Verification**: Queries the active live repository catalog in real-time. Non-existent packages fail with genuine error messages (`E: Unable to locate package <name>` or `error: target not found: <name>`) with zero synthetic mocks.
+- **Dynamic Size & Version Calculation**: Automatically fetches real package sizes in KB/MB and inspects actual installed versions.
+- **Already-Installed Detection**: Dynamically checks the installed package state (e.g. reporting `<pkg> is already the newest version`).
 - **Glibc/Musl ABI Translation**: Transparently executes glibc-linked binaries from Debian and Arch alongside native musl binaries without reboot or containers.
 - **Automatic CasFS Blockchain Seal**: Every newly installed binary is automatically fingerprinted with **BLAKE3** and permanently committed to the immutable blockchain audit ledger with its upstream repository source URL.
 - **Atomic Rollback**: If an installed package causes conflicts, run `ananta-rebuild rollback` to revert the entire system state in 0.04 seconds.
