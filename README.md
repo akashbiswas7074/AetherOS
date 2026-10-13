@@ -571,6 +571,11 @@ To verify CasFS deduplication, blockchain audit integrity, and test the declarat
 make sim
 ```
 
+<p align="center">
+  <img src="assets/ananta_arch_sim_test.png" alt="AnantaOS Architecture Simulator Execution" width="95%">
+  <br>
+  <em>Live verification of physical frame allocation, CasFS BLAKE3 deduplication, Flake Gen 1 Merkle root, capability sandbox, Multi-ABI execution, and Blockchain Audit Block #0 attestation.</em>
+</p>
 
 ---
 
@@ -583,13 +588,20 @@ The test suite validates:
 4. **Folder Merkle Trees**: Computes hierarchical directory hashes and detects tampering.
 5. **Blockchain Audit Ledger**: Verifies chain continuity and tamper-evident blocks.
 6. **Binary Format Detection**: Validates ELF, PE, and Mach-O header parsing.
-7. **System Flake Generations**: Validates atomic $O(1)$ rollback and generation switching.
+7. **Universal Package Manager**: Validates automated Debian (.deb), Arch (AUR), and Nix store packaging.
+8. **System Flake Generations**: Validates atomic $O(1)$ rollback and generation switching.
 
 Run all checks:
 ```bash
 make check
 make test
 ```
+
+<p align="center">
+  <img src="assets/ananta_test_suite.png" alt="AnantaOS Declarative Microkernel Test Suite (All 23 Tests Passed)" width="95%">
+  <br>
+  <em>AnantaOS complete unit test suite executing across CasFS, Manifest, Multi-ABI, and Security crates with 100% pass rate (23/23 tests passed).</em>
+</p>
 
 ---
 
