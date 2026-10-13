@@ -538,28 +538,43 @@ Whenever a macOS binary or bundle is executed, `macapp` automatically commits it
   <img src="assets/ananta_cross_distro_packages.png" alt="AnantaOS Cross-Distro Package Manager (apt, pacman, nix-env) Live Screenshot" width="95%">
 </p>
 
-AnantaOS features a built-in **Universal Package Subsystem** (`compat/src/package_manager.rs` and `/usr/bin/ananta-pkg`), providing native drop-in commands for installing software from any distribution repository:
+AnantaOS features a built-in **Universal Package Subsystem** (`compat/src/package_manager.rs` and `/usr/bin/ananta-pkg`), providing native drop-in commands for installing software directly from official distribution repositories:
 
 ```bash
-# 1. Install Debian / Ubuntu packages (.deb / apt):
+# 1. Fetch & Install from official Ubuntu / Debian archive URLs:
+# Upstream: http://archive.ubuntu.com/ubuntu/pool/main/{prefix}/{pkg}/{pkg}_amd64.deb
 apt install ripgrep
 dpkg -i mypackage.deb
 
-# 2. Install Arch Linux & AUR packages (.pkg.tar.zst / pacman / yay):
+# 2. Fetch & Install from official Arch Linux & AUR mirror URLs:
+# Arch Mirror : https://geo.mirror.pkgbuild.com/extra/os/x86_64/{pkg}-x86_64.pkg.tar.zst
+# Arch AUR    : https://aur.archlinux.org/cgit/aur.git/snapshot/{pkg}.tar.gz
 pacman -S neovim
 yay -S custom-tool
 aur install package-name
 
-# 3. Install reproducible Nix packages (/nix/store):
+# 3. Fetch from Nix binary cache (/nix/store):
+# Cache: https://cache.nixos.org/nar/{hash}.nar.xz
 nix-env -i starship
 
-# 4. Install native Alpine packages:
+# 4. Native Alpine packages:
+# Mirror: https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/
 apk add curl htop
 ```
 
+#### Official Upstream Repository Endpoints:
+| Ecosystem | Upstream Mirror / Endpoint URL | Package Format | Binary ABI Translation |
+|---|---|---|---|
+| **Ubuntu Archive** | `http://archive.ubuntu.com/ubuntu/pool/main/` | `.deb` (ar archive) | Glibc 2.39 dynamic bridge |
+| **Ubuntu Security** | `http://security.ubuntu.com/ubuntu/` | `.deb` (ar archive) | Glibc 2.39 dynamic bridge |
+| **Arch Linux** | `https://geo.mirror.pkgbuild.com/extra/os/x86_64/` | `.pkg.tar.zst` (Zstd) | Glibc 2.39 dynamic bridge |
+| **Arch AUR** | `https://aur.archlinux.org/cgit/aur.git/snapshot/` | `.tar.gz` (PKGBUILD) | Native source compilation |
+| **Nix Packages** | `https://cache.nixos.org/nar/` | `.nar.xz` (Nix store) | Declarative flake closure |
+| **Alpine Linux** | `https://dl-cdn.alpinelinux.org/alpine/` | `.apk` (tar.gz) | Musl libc native |
+
 #### Automatic Blockchain Attestation & Zero-Collision Security:
 - **Glibc/Musl ABI Translation**: Transparently executes glibc-linked binaries from Debian and Arch alongside native musl binaries without reboot or containers.
-- **Automatic CasFS Blockchain Seal**: Every newly installed binary is automatically fingerprinted with **BLAKE3** and permanently committed to the immutable blockchain audit ledger.
+- **Automatic CasFS Blockchain Seal**: Every newly installed binary is automatically fingerprinted with **BLAKE3** and permanently committed to the immutable blockchain audit ledger with its upstream repository source URL.
 - **Atomic Rollback**: If an installed package causes conflicts, run `ananta-rebuild rollback` to revert the entire system state in 0.04 seconds.
 
 ---

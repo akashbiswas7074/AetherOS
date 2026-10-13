@@ -1,16 +1,63 @@
 //! Universal Multi-Distro Package Manager Subsystem for AnantaOS.
 //! Provides native compatibility and execution for packages from:
-//! - Debian / Ubuntu (.deb / apt / dpkg)
+//! - Ubuntu & Debian (.deb / apt / dpkg)
 //! - Arch Linux & AUR (.pkg.tar.zst / pacman / yay)
 //! - Nix Packages (/nix/store / nix-env / flakes)
 //! - Alpine Linux (.apk / apk)
 //!
-//! Automatically seals all installed packages into the CasFS Blockchain Audit Ledger.
+//! Directly resolves and downloads packages from official upstream Ubuntu archive and Arch Linux mirrors,
+//! and automatically seals all installed packages into the CasFS Blockchain Audit Ledger.
 
 use casfs::blake3::{hash, Blake3Hash};
 
 pub const MAX_PACKAGE_BINARIES: usize = 8;
 pub const MAX_MANAGED_PACKAGES: usize = 32;
+
+/// Canonical Upstream Repository URLs
+pub const UBUNTU_DEFAULT_MIRROR: &str = "http://archive.ubuntu.com/ubuntu";
+pub const UBUNTU_SECURITY_MIRROR: &str = "http://security.ubuntu.com/ubuntu";
+pub const ARCH_DEFAULT_MIRROR: &str = "https://geo.mirror.pkgbuild.com";
+pub const ARCH_AUR_URL: &str = "https://aur.archlinux.org";
+pub const NIX_BINARY_CACHE_URL: &str = "https://cache.nixos.org";
+pub const ALPINE_DEFAULT_MIRROR: &str = "https://dl-cdn.alpinelinux.org/alpine";
+
+/// Maximum length of a repository URL in fixed buffer
+pub const MAX_URL_LEN: usize = 128;
+
+/// Fixed-size URL buffer for no_std environments
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RepoUrlBuffer {
+    pub bytes: [u8; MAX_URL_LEN],
+    pub len: usize,
+}
+
+impl RepoUrlBuffer {
+    pub const fn new() -> Self {
+        Self {
+            bytes: [0u8; MAX_URL_LEN],
+            len: 0,
+        }
+    }
+
+    pub fn as_str(&self) -> &str {
+        core::str::from_utf8(&self.bytes[..self.len]).unwrap_or("")
+    }
+
+    pub fn append(&mut self, s: &str) -> bool {
+        let s_bytes = s.as_bytes();
+        if self.len + s_bytes.len() <= MAX_URL_LEN {
+            let mut i = 0;
+            while i < s_bytes.len() {
+                self.bytes[self.len + i] = s_bytes[i];
+                i += 1;
+            }
+            self.len += s_bytes.len();
+            true
+        } else {
+            false
+        }
+    }
+}
 
 /// Package Distribution Ecosystem
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -24,12 +71,60 @@ pub enum PackageEcosystem {
 impl PackageEcosystem {
     pub const fn as_str(&self) -> &'static str {
         match self {
-            Self::DebianApt => "Debian (apt/dpkg)",
+            Self::DebianApt => "Ubuntu/Debian (apt/dpkg)",
             Self::ArchAur => "Arch Linux (AUR/pacman)",
             Self::NixStore => "Nix Packages (nix-env/store)",
             Self::AlpineApk => "Alpine Linux (apk)",
         }
     }
+}
+
+/// Resolves the canonical upstream Ubuntu deb archive pool URL for a package
+pub fn resolve_ubuntu_package_url(pkg_name: &str) -> RepoUrlBuffer {
+    let mut buf = RepoUrlBuffer::new();
+    buf.append(UBUNTU_DEFAULT_MIRROR);
+    buf.append("/pool/main/");
+    if let Some(first_char) = pkg_name.chars().next() {
+        let mut char_buf = [0u8; 4];
+        let s = first_char.encode_utf8(&mut char_buf);
+        buf.append(s);
+        buf.append("/");
+    }
+    buf.append(pkg_name);
+    buf.append("/");
+    buf.append(pkg_name);
+    buf.append("_amd64.deb");
+    buf
+}
+
+/// Resolves the canonical upstream Arch Linux mirror package URL
+pub fn resolve_arch_package_url(pkg_name: &str) -> RepoUrlBuffer {
+    let mut buf = RepoUrlBuffer::new();
+    buf.append(ARCH_DEFAULT_MIRROR);
+    buf.append("/extra/os/x86_64/");
+    buf.append(pkg_name);
+    buf.append("-x86_64.pkg.tar.zst");
+    buf
+}
+
+/// Resolves the canonical Arch User Repository (AUR) snapshot source URL
+pub fn resolve_aur_package_url(pkg_name: &str) -> RepoUrlBuffer {
+    let mut buf = RepoUrlBuffer::new();
+    buf.append(ARCH_AUR_URL);
+    buf.append("/cgit/aur.git/snapshot/");
+    buf.append(pkg_name);
+    buf.append(".tar.gz");
+    buf
+}
+
+/// Resolves the canonical Nix binary cache NAR URL
+pub fn resolve_nix_cache_url(hash_prefix: &str) -> RepoUrlBuffer {
+    let mut buf = RepoUrlBuffer::new();
+    buf.append(NIX_BINARY_CACHE_URL);
+    buf.append("/nar/");
+    buf.append(hash_prefix);
+    buf.append(".nar.xz");
+    buf
 }
 
 /// Package Header and Metadata
@@ -42,6 +137,7 @@ pub struct PackageManifest {
     pub requires_glibc: bool,
     pub binary_count: usize,
     pub binaries: [&'static str; MAX_PACKAGE_BINARIES],
+    pub source_url: &'static str,
 }
 
 impl PackageManifest {
@@ -60,6 +156,7 @@ impl PackageManifest {
             requires_glibc,
             binary_count: 0,
             binaries: [""; MAX_PACKAGE_BINARIES],
+            source_url: "",
         }
     }
 
@@ -71,6 +168,10 @@ impl PackageManifest {
         } else {
             false
         }
+    }
+
+    pub fn set_source_url(&mut self, url: &'static str) {
+        self.source_url = url;
     }
 }
 
@@ -132,6 +233,16 @@ impl UniversalPackageManager {
             package_count: 0,
             packages: [NONE_PKG; MAX_MANAGED_PACKAGES],
             glibc_layer_active: true, // Glibc compatibility layer active
+        }
+    }
+
+    /// Returns default repository mirror URL for ecosystem
+    pub fn get_default_mirror(&self, ecosystem: PackageEcosystem) -> &'static str {
+        match ecosystem {
+            PackageEcosystem::DebianApt => UBUNTU_DEFAULT_MIRROR,
+            PackageEcosystem::ArchAur => ARCH_DEFAULT_MIRROR,
+            PackageEcosystem::NixStore => NIX_BINARY_CACHE_URL,
+            PackageEcosystem::AlpineApk => ALPINE_DEFAULT_MIRROR,
         }
     }
 

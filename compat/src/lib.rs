@@ -11,8 +11,9 @@ pub use binary_format::{detect_format, BinaryFormat};
 pub use linux_abi::LinuxSubsystem;
 pub use macos_abi::MacSubsystem;
 pub use package_manager::{
-    detect_package_format, PackageDetection, PackageEcosystem, PackageManifest,
-    UniversalPackageManager,
+    detect_package_format, resolve_arch_package_url, resolve_aur_package_url,
+    resolve_ubuntu_package_url, PackageDetection, PackageEcosystem, PackageManifest,
+    UniversalPackageManager, ARCH_DEFAULT_MIRROR, UBUNTU_DEFAULT_MIRROR,
 };
 pub use universal_runner::{ExecutionResult, UniversalAbiEngine};
 pub use windows_abi::WindowsSubsystem;
@@ -178,5 +179,35 @@ mod tests {
         assert!(pm.verify_package_integrity("curl", b"debian_curl_binary_payload"));
         assert!(pm.verify_package_integrity("htop", b"arch_htop_binary_payload"));
         assert!(!pm.verify_package_integrity("htop", b"tampered_attacker_payload"));
+    }
+
+    #[test]
+    fn test_resolve_ubuntu_archive_package_url() {
+        let url_buf = resolve_ubuntu_package_url("ripgrep");
+        assert_eq!(
+            url_buf.as_str(),
+            "http://archive.ubuntu.com/ubuntu/pool/main/r/ripgrep/ripgrep_amd64.deb"
+        );
+
+        let curl_url = resolve_ubuntu_package_url("curl");
+        assert_eq!(
+            curl_url.as_str(),
+            "http://archive.ubuntu.com/ubuntu/pool/main/c/curl/curl_amd64.deb"
+        );
+    }
+
+    #[test]
+    fn test_resolve_arch_mirror_and_aur_urls() {
+        let arch_buf = resolve_arch_package_url("neovim");
+        assert_eq!(
+            arch_buf.as_str(),
+            "https://geo.mirror.pkgbuild.com/extra/os/x86_64/neovim-x86_64.pkg.tar.zst"
+        );
+
+        let aur_buf = resolve_aur_package_url("spotify");
+        assert_eq!(
+            aur_buf.as_str(),
+            "https://aur.archlinux.org/cgit/aur.git/snapshot/spotify.tar.gz"
+        );
     }
 }
