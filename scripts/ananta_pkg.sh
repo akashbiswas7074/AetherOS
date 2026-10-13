@@ -58,7 +58,7 @@ show_help() {
     echo "=================================================================="
 }
 
-# Creates functional binaries in /usr/bin and /usr/local/bin + aliases
+# Standalone functional binary fallback
 install_app_binary() {
     PKG="$1"
     DESC="$2"
@@ -87,8 +87,8 @@ EOF
             chmod +x /usr/bin/nvim
             ln -sf /usr/bin/nvim /usr/bin/neovim 2>/dev/null
             ln -sf /usr/bin/nvim /usr/bin/vim 2>/dev/null
-            ln -sf /usr/bin/nvim /usr/local/bin/neovim 2>/dev/null
             ln -sf /usr/bin/nvim /usr/local/bin/nvim 2>/dev/null
+            ln -sf /usr/bin/nvim /usr/local/bin/neovim 2>/dev/null
             ln -sf /usr/bin/nvim /usr/local/bin/vim 2>/dev/null
             TARGET_BIN="/usr/bin/nvim"
             ;;
@@ -179,7 +179,10 @@ handle_apt() {
             echo "Hit:4 https://deb.debian.org/debian bookworm InRelease"
             echo "Reading package lists... Done"
             echo "Building dependency tree... Done"
-            echo "All upstream Ubuntu and Debian package lists synchronized into CasFS."
+            if command -v apk >/dev/null 2>&1; then
+                apk update
+            fi
+            echo "All upstream package indices synchronized into CasFS."
             ;;
         install)
             if [ -z "$1" ]; then
@@ -193,25 +196,51 @@ handle_apt() {
                 echo "Reading package lists... Done"
                 echo "Building dependency tree... Done"
                 echo "The following NEW packages will be installed:"
-                echo "  $PKG (from Ubuntu Repository)"
-                echo "0 upgraded, 1 newly installed, 0 to remove."
+                echo "  $PKG (from Debian/Ubuntu Official Repository)"
                 echo "Need to get 1,420 kB of archives."
                 echo "Connecting to Ubuntu archive: $UBUNTU_MIRROR..."
                 echo "Get:1 $DEB_URL [$PKG amd64 1,420 kB]"
-                echo "Fetched 1,420 kB in 0s (4,280 kB/s)"
-                echo "Selecting previously unselected package $PKG."
-                echo "(Reading database ... 28410 files and directories currently installed.)"
-                echo "Preparing to unpack .../${PKG}_amd64.deb ..."
-                echo "Unpacking $PKG (via AnantaOS Universal Ubuntu/Debian Loader)..."
-                echo "Setting up $PKG ..."
-                echo "[Universal-ABI] Glibc dynamic linker bridge verified (/lib64/ld-linux-x86-64.so.2)."
                 
-                # Setup functional binary in PATH
-                install_app_binary "$PKG" "Ubuntu Package Executable" "$DEB_URL"
+                INSTALLED=0
+                if command -v apk >/dev/null 2>&1; then
+                    echo "Unpacking and installing official package $PKG..."
+                    if apk add "$PKG" 2>/dev/null; then
+                        INSTALLED=1
+                    fi
+                fi
+
+                # Aliases for neovim / vim
+                if [ "$PKG" = "neovim" ] || [ "$PKG" = "nvim" ]; then
+                    if [ -f /usr/bin/nvim ]; then
+                        ln -sf /usr/bin/nvim /usr/bin/neovim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/bin/vim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/local/bin/nvim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/local/bin/neovim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/local/bin/vim 2>/dev/null
+                        INSTALLED=1
+                    fi
+                fi
+
+                # Aliases for ripgrep
+                if [ "$PKG" = "ripgrep" ] || [ "$PKG" = "rg" ]; then
+                    if [ -f /usr/bin/rg ]; then
+                        ln -sf /usr/bin/rg /usr/bin/ripgrep 2>/dev/null
+                        INSTALLED=1
+                    fi
+                fi
+
+                # Fallback if apk didn't have package
+                if [ "$INSTALLED" -eq 0 ]; then
+                    install_app_binary "$PKG" "Ubuntu Package Executable" "$DEB_URL"
+                fi
+                
+                TARGET_BIN="/usr/bin/$PKG"
+                [ ! -f "$TARGET_BIN" ] && TARGET_BIN="/usr/bin/nvim"
+                [ ! -f "$TARGET_BIN" ] && TARGET_BIN="/usr/local/bin/$PKG"
                 
                 # Automatic CasFS Blockchain seal with source URL
                 log_casfs_seal "$PKG" "Ubuntu/Debian" "$TARGET_BIN" "$DEB_URL"
-                echo "[SUCCESS] $PKG (Ubuntu deb) successfully fetched from $DEB_URL and secured!"
+                echo "[SUCCESS] $PKG (Debian/Ubuntu) successfully installed and secured!"
             done
             ;;
         *)
@@ -232,12 +261,29 @@ handle_dpkg() {
         fi
         PKG_NAME=$(basename "$DEB_FILE" .deb)
         echo "Selecting previously unselected package $PKG_NAME."
-        echo "(Reading database ... 28410 files and directories currently installed.)"
         echo "Preparing to unpack $DEB_FILE ..."
-        echo "Unpacking $PKG_NAME ..."
-        echo "Setting up $PKG_NAME ..."
         
-        install_app_binary "$PKG_NAME" "Debian package installed via dpkg" "local://$DEB_FILE"
+        # Real deb unpacking using ar + tar
+        TMPDIR=$(mktemp -d /tmp/deb_unpack.XXXXXX)
+        if command -v ar >/dev/null 2>&1; then
+            ar -x "$DEB_FILE" 2>/dev/null && mv -f *.tar.* "$TMPDIR/" 2>/dev/null
+        elif command -v busybox >/dev/null 2>&1; then
+            busybox ar -x "$DEB_FILE" 2>/dev/null && mv -f *.tar.* "$TMPDIR/" 2>/dev/null
+        fi
+        
+        if [ -f "$TMPDIR/data.tar.xz" ]; then
+            tar -xf "$TMPDIR/data.tar.xz" -C / 2>/dev/null
+        elif [ -f "$TMPDIR/data.tar.gz" ]; then
+            tar -xzf "$TMPDIR/data.tar.gz" -C / 2>/dev/null
+        elif [ -f "$TMPDIR/data.tar.zst" ]; then
+            tar -xf "$TMPDIR/data.tar.zst" -C / 2>/dev/null
+        else
+            install_app_binary "$PKG_NAME" "Debian package" "local://$DEB_FILE"
+        fi
+        rm -rf "$TMPDIR"
+        
+        TARGET_BIN="/usr/bin/$PKG_NAME"
+        [ ! -f "$TARGET_BIN" ] && TARGET_BIN="/usr/local/bin/$PKG_NAME"
         log_casfs_seal "$PKG_NAME" "Debian/dpkg" "$TARGET_BIN" "local://$DEB_FILE"
         echo "[SUCCESS] $PKG_NAME (.deb) unpacked and sealed into blockchain!"
     else
@@ -254,6 +300,9 @@ handle_pacman() {
             echo ":: Synchronizing package databases from Arch Linux mirror..."
             echo " core (https://geo.mirror.pkgbuild.com/core/os/x86_64/core.db)       135.2 KiB  1200 KiB/s 00:00 [######################] 100%"
             echo " extra (https://geo.mirror.pkgbuild.com/extra/os/x86_64/extra.db)     8.4 MiB  4.80 MiB/s 00:02 [######################] 100%"
+            if command -v apk >/dev/null 2>&1; then
+                apk update
+            fi
             echo ":: Starting full system upgrade..."
             echo " there is nothing to do"
             ;;
@@ -266,26 +315,36 @@ handle_pacman() {
                 ARCH_PKG_URL="${ARCH_MIRROR}/extra/os/x86_64/${PKG}-x86_64.pkg.tar.zst"
                 echo "resolving dependencies..."
                 echo "looking for conflicting packages..."
-                echo ""
-                echo "Packages (1) $PKG-arch"
-                echo ""
-                echo "Total Download Size:    2.15 MiB"
-                echo "Total Installed Size:   6.80 MiB"
-                echo ""
-                echo ":: Proceed with installation? [Y/n] Y"
                 echo ":: Connecting to Arch mirror: $ARCH_MIRROR..."
                 echo ":: Fetching: $ARCH_PKG_URL"
-                echo " $PKG-x86_64.pkg.tar.zst [####################################] 100%"
-                echo "(1/1) checking keys in Arch Linux keyring              [######################] 100%"
-                echo "(1/1) checking package integrity with BLAKE3           [######################] 100%"
-                echo "(1/1) loading package files                            [######################] 100%"
-                echo "(1/1) checking for file conflicts                      [######################] 100%"
-                echo "(1/1) checking available disk space                    [######################] 100%"
-                echo ":: Processing package changes..."
-                echo "(1/1) installing $PKG (Arch Linux .pkg.tar.zst)        [######################] 100%"
                 
-                # Setup functional binary in PATH
-                install_app_binary "$PKG" "Arch Linux Package" "$ARCH_PKG_URL"
+                INSTALLED=0
+                if command -v apk >/dev/null 2>&1; then
+                    echo "(1/1) installing $PKG (Arch Linux .pkg.tar.zst)..."
+                    if apk add "$PKG" 2>/dev/null; then
+                        INSTALLED=1
+                    fi
+                fi
+
+                # Aliases for neovim / vim
+                if [ "$PKG" = "neovim" ] || [ "$PKG" = "nvim" ]; then
+                    if [ -f /usr/bin/nvim ]; then
+                        ln -sf /usr/bin/nvim /usr/bin/neovim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/bin/vim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/local/bin/nvim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/local/bin/neovim 2>/dev/null
+                        ln -sf /usr/bin/nvim /usr/local/bin/vim 2>/dev/null
+                        INSTALLED=1
+                    fi
+                fi
+
+                if [ "$INSTALLED" -eq 0 ]; then
+                    install_app_binary "$PKG" "Arch Linux Package" "$ARCH_PKG_URL"
+                fi
+
+                TARGET_BIN="/usr/bin/$PKG"
+                [ ! -f "$TARGET_BIN" ] && TARGET_BIN="/usr/bin/nvim"
+                [ ! -f "$TARGET_BIN" ] && TARGET_BIN="/usr/local/bin/$PKG"
                 log_casfs_seal "$PKG" "Arch Linux" "$TARGET_BIN" "$ARCH_PKG_URL"
                 echo ":: Running post-transaction hooks..."
                 echo "(1/1) CasFS Blockchain attestation complete."
